@@ -2,14 +2,14 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import "./App.css";
 import HomePage from "./pages/HomePage/HomePage.tsx";
 import SignInPage from "./pages/SignInPage/SignInPage.tsx";
-import AuthProvider from "./Auth/AuthProvider";
-import ProtectedRoute from "./Auth/ProtectedRoute";
 import Layout from "./components/Layout/Layout.tsx";
 import ContactPage from "./pages/ContactPage/ContactPage.tsx";
 import LoginPage from "./pages/LogInPage/LoginPage.tsx";
 import DestinationPage from "./pages/DestinationPage/DestinationPage.tsx";
 import ItineraryPage from "./pages/ItineraryPage/ItineraryPage.tsx";
 import NotFoundPage from "./pages/NotFoundPage/NotFoundPage.tsx";
+import { Provider } from "react-redux";
+import store from "./app/store.ts";
 
 function App() {
   const router = createBrowserRouter([
@@ -24,9 +24,7 @@ function App() {
         {
           path: "/",
           element: (
-            <ProtectedRoute>
               <HomePage />
-            </ProtectedRoute>
           ),
         },
         {
@@ -54,9 +52,9 @@ function App() {
   ]);
   return (
     <>
-      <AuthProvider isSignedIn={true}>
+      <Provider store={store}>
         <RouterProvider router={router} />
-      </AuthProvider>
+      </Provider>
     </>
   );
 }
