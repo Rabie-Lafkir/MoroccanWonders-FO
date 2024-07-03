@@ -1,4 +1,3 @@
-// src/helpers/axiosInstance.ts
 import axios from 'axios';
 import { store } from '../store/store';
 import { setAuthData, clearAuthData } from '../store/authSlice';
