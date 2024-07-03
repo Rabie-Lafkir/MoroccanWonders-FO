@@ -1,0 +1,43 @@
+.avatar-dropdown {
+    position: relative;
+    display: inline-block;
+    width: 40px; /* Adjust width as needed */
+  }
+  
+  .avatar-dropdown select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding: 8px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s ease;
+    width: 100%;
+  }
+  
+  .avatar-dropdown select:focus {
+    border-color: #007bff; /* Change border color on focus */
+  }
+  
+  .avatar-dropdown select option {
+    padding: 10px;
+  }
+  
+  .avatar-dropdown::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    background-image: url('path/to/avatar.png'); /* Replace with your avatar image path */
+    background-size: cover;
+    background-position: center;
+    border-radius: 50%;
+  }
+  

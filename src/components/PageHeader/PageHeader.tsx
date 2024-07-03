@@ -1,5 +1,5 @@
 import React from "react";
-import { PageHeaderProps } from "../../Types/PageHeaderProps";
+import { PageHeaderProps } from "../../types/PageHeaderProps";
 import "./PageHeader.css";
 
 const PageHeader: React.FC<PageHeaderProps> = ({

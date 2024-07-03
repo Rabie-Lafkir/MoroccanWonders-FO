@@ -1,48 +1,49 @@
+// src/pages/LogInPage/LoginPage.tsx
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import PageHeader from '../../components/PageHeader/PageHeader';
-import { login } from '../../features/auth/authSlice';
-import { RootState, AppDispatch } from '../../app/store';
-import { useNavigate } from "react-router-dom";
-
+import { setAuthData } from '../../store/authSlice';
+import axiosInstance from '../../helpers/axiosInstance';
 
 export default function LoginPage() {
   const { t } = useTranslation();
-  const dispatch = useDispatch<AppDispatch>();
-  const auth = useSelector((state: RootState) => state.auth);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-
-
-  const breadcrumbItems = [
-    { label: t('home'), url: '/' },
-    { label: t('login') },
-  ];
-
-  const title: string = `${t('login')} - Moroccan Wonders`;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    await dispatch(login({ username, password }));
-    if (auth.status === 'succeeded') {
-      navigate("/");
-
+    try {
+      const response = await axiosInstance.post('/account/login', { username, password });
+      const data = response.data;
+      dispatch(setAuthData({
+        userId: data.userId,
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+      }));
+      navigate('/');
+    } catch (error) {
+      console.log(error);
+      
     }
   };
 
   return (
     <>
       <Helmet>
-        <title>{title}</title>
+        <title>{`${t('login')} - Moroccan Wonders`}</title>
       </Helmet>
       <PageHeader
         backgroundImageUrl="assets/images/backgrounds/page-header-contact.jpg"
         pageTitle={t('login')}
-        breadcrumbItems={breadcrumbItems}
+        breadcrumbItems={[
+          { label: t('home'), url: '/' },
+          { label: t('login') },
+        ]}
       />
       <section className="contact-one" style={{ marginTop: '80px' }}>
         <div className="container">
@@ -65,8 +66,8 @@ export default function LoginPage() {
                     <div className="input-group">
                       <input
                         name="username"
-                        type="username"
-                        placeholder="username"
+                        type="text"
+                        placeholder="Username"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                       />
@@ -100,7 +101,6 @@ export default function LoginPage() {
                     </div>
                   </div>
                 </div>
-                {auth.error && <p className="error">{auth.error}</p>}
               </form>
             </div>
           </div>
