@@ -1,4 +1,3 @@
-// src/pages/LogInPage/LoginPage.tsx
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
@@ -99,6 +98,7 @@ export default function LoginPage() {
                         {t('login')}
                       </button>
                     </div>
+                    <a href="javascript:void(0)">Forget password ?</a>
                   </div>
                 </div>
               </form>

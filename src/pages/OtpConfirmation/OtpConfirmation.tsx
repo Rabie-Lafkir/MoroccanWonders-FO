@@ -10,28 +10,24 @@ export default function OtpConfirmation() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const email = location.state?.email || '';
-  const [token, setToken] = useState<string | number | undefined>();
+  const email = location.state?.email || "";
+  const [token, setTokens] = useState<string | number | undefined>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const cleanToken = (token : any) => {
-    return token ? token.toString().trim() : '';
-  };
-
-  const handleSubmit = async (e : Event) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
-    const cleanedToken = cleanToken(token);
-    console.log("Cleaned Token:", cleanedToken);
-
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/account/confirm_sign_up`, {
-        username: email,
-        confirmationCode: cleanedToken,
-      });
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/account/confirm_sign_up`,
+        {
+          username: email,
+          confirmationCode: token,
+        }
+      );
       // Handle success (e.g., navigate to a new page, display a success message, etc.)
       console.log("OTP confirmation successful", response.data);
       navigate("/login"); // Redirect to sign-in page after successful OTP confirmation
@@ -42,6 +38,31 @@ export default function OtpConfirmation() {
       setLoading(false);
     }
   };
+
+
+  const resendConfirmationCode = async (email:string) => {
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/account/resend_confirm_code`, null, {
+        params: { username: email },
+      });
+      console.log("Resend confirmation code successful", response.data);
+      return response.data; // Return the response data if needed
+    } catch (error) {
+      console.error("Resend confirmation code failed", error);
+      throw error; // Throw the error to be handled by the caller
+    }
+  };
+  
+
+  const handleResendCode = async () => {
+      try {
+        await resendConfirmationCode(email);
+        alert("Confirmation code resent successfully");
+      } catch (error) {
+        alert("Failed to resend confirmation code");
+      }
+    };
+    
 
   return (
     <>
@@ -80,7 +101,7 @@ export default function OtpConfirmation() {
                         <InputOtp
                           length={6}
                           value={token}
-                          onChange={(e) => setToken(e.value)}
+                          onChange={(e) => setTokens(e.value)}
                         />
                       </div>
                     </div>
@@ -96,8 +117,13 @@ export default function OtpConfirmation() {
                         {loading ? t("confirming") : t("confirm")}
                       </button>
                     </div>
+                    <a href="javascript:void(0)" onClick={handleResendCode}>Resend code</a>
                   </div>
-                  {error && <div className="col-md-12"><p className="error-message">{error}</p></div>}
+                  {error && (
+                    <div className="col-md-12">
+                      <p className="error-message">{error}</p>
+                    </div>
+                  )}
                 </div>
               </form>
             </div>

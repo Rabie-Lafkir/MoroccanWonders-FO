@@ -11,6 +11,7 @@ import DestinationPage from './pages/DestinationPage/DestinationPage.tsx';
 import ItineraryPage from './pages/ItineraryPage/ItineraryPage.tsx';
 import NotFoundPage from './pages/NotFoundPage/NotFoundPage.tsx';
 import { setAuthData } from './store/authSlice';
+import OtpConfirmation from './pages/OtpConfirmation/OtpConfirmation.tsx';
 
 function App() {
   const dispatch = useDispatch();
@@ -39,6 +40,7 @@ function App() {
         { path: '/contact', element: <ContactPage /> },
         { path: '/signin', element: <SignInPage /> },
         { path: '/login', element: <LoginPage /> },
+        { path: '/confirmation', element: <OtpConfirmation /> },
       ],
     },
   ]);
