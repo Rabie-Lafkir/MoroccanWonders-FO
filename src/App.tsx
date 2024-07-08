@@ -11,7 +11,9 @@ import DestinationPage from './pages/DestinationPage/DestinationPage.tsx';
 import ItineraryPage from './pages/ItineraryPage/ItineraryPage.tsx';
 import NotFoundPage from './pages/NotFoundPage/NotFoundPage.tsx';
 import { setAuthData } from './store/authSlice';
-import OtpConfirmation from './pages/OtpConfirmation/OtpConfirmation.tsx';
+import OtpConfirmationPage from './pages/OtpConfirmationPage/OtpConfirmationPage.tsx';
+import ForgetPasswordPage from './pages/ForgetPasswordPage/ForgetPasswordPage.tsx';
+import ConfirmResetPasswordPage from './pages/ConfirmResetPasswordPage/ConfirmResetPasswordPage.tsx';
 
 function App() {
   const dispatch = useDispatch();
@@ -20,7 +22,6 @@ function App() {
     const accessToken = localStorage.getItem('accessToken');
     const refreshToken = localStorage.getItem('refreshToken');
     if (accessToken && refreshToken) {
-      // Assume userId and other details can be decoded from the token or fetched from an API
       dispatch(setAuthData({ userId: 'decodedUserId', accessToken, refreshToken }));
     }
   }, [dispatch]);
@@ -40,7 +41,10 @@ function App() {
         { path: '/contact', element: <ContactPage /> },
         { path: '/signin', element: <SignInPage /> },
         { path: '/login', element: <LoginPage /> },
-        { path: '/confirmation', element: <OtpConfirmation /> },
+        { path: '/confirmation', element: <OtpConfirmationPage /> },
+        { path: '/forget-password', element: <ForgetPasswordPage /> },
+        { path: '/confirm-reset-password', element: <ConfirmResetPasswordPage /> },
+
       ],
     },
   ]);

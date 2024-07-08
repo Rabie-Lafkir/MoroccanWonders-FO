@@ -6,7 +6,7 @@ import { useState } from "react";
 import { InputOtp } from "primereact/inputotp";
 import axios from "axios";
 
-export default function OtpConfirmation() {
+export default function OtpConfirmationPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();

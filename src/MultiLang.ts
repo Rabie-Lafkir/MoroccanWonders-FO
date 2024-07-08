@@ -41,7 +41,17 @@ i18n.use(initReactI18next).init({
         confirmationEmail: "Email confirmation",
         confirm: "Confirm",
         titleConfirmEmail: "Confirm your email",
-        descriptionConfirmation: "Welcome! To verify your identity and secure your account, please enter the One-Time Password (OTP) sent to your email or phone. Simply type the OTP into the field below and click 'Confirm'. If you encounter any issues, our support team is here to help."
+        descriptionConfirmation:
+          "Welcome! To verify your identity and secure your account, please enter the One-Time Password (OTP) sent to your email or phone. Simply type the OTP into the field below and click 'Confirm'. If you encounter any issues, our support team is here to help.",
+        submit: "Submit",
+        forgotPasswordDesc: "If you've forgotten your password, enter your email below. We'll send you a code to reset it.",
+        resetPassword: "Reset password",
+        resetPasswordTitle: "Reset your password",
+        redirectSignup: "Don't have an account? ",
+        rememberMe: "Remember me",
+        confirmForgotPasswordDesc: "Please enter your new password and the code you received via email to reset your password.",
+        confirmResetPassword: "Confirm reset password",
+        confirmResetPasswordTitle: "Confirm your password Modification",
       },
     },
     fr: {
@@ -75,14 +85,25 @@ i18n.use(initReactI18next).init({
         titleLogin: "Connectez-vous à votre compte",
         descriptionLogin:
           "Connectez-vous pour sauvegarder vos trajets et évaluer les lieux visités. Vos données contribuent à personnaliser votre expérience et à fournir des recommandations adaptées à vos goûts. Rejoignez-nous pour enrichir votre exploration et aider les autres voyageurs.",
-          error: "erreur",
+        error: "erreur",
         notFound: "Page introuvable",
-        notFoundDesc: "Désolé, nous n'avons pas pu trouver la page que vous recherchez.",
+        notFoundDesc:
+          "Désolé, nous n'avons pas pu trouver la page que vous recherchez.",
         backToHome: "Revenir à la page d'acceuil",
         confirmationEmail: "Confirmation de l'email",
         confirm: "Confirmer",
         titleConfirmEmail: "Confirmer votre email",
-        descriptionConfirmation: "Bienvenue ! Pour vérifier votre identité et sécuriser votre compte, veuillez entrer le mot de passe à usage unique (OTP) envoyé à votre email ou téléphone. Tapez simplement l’OTP dans le champ ci-dessous et cliquez sur 'Confirmer'. Si vous rencontrez des problèmes, notre équipe de support est là pour vous aider."
+        descriptionConfirmation:
+          "Bienvenue ! Pour vérifier votre identité et sécuriser votre compte, veuillez entrer le mot de passe à usage unique (OTP) envoyé à votre email ou téléphone. Tapez simplement l’OTP dans le champ ci-dessous et cliquez sur 'Confirmer'. Si vous rencontrez des problèmes, notre équipe de support est là pour vous aider.",
+        submit: "Envoyer",
+        forgotPasswordDesc: "Si vous avez oublié votre mot de passe, saisissez votre adresse e-mail ci-dessous. Nous vous enverrons un code pour le réinitialiser.",
+        resetPassword: "Réinitialiser le mot de passe",
+        resetPasswordTitle: "Réinitialisez votre mot de passe",
+        redirectSignup: "Vous n'avez pas de compte? ",
+        rememberMe: "Se souvenir de moi",
+        confirmForgotPasswordDesc: "Veuillez entrer votre nouveau mot de passe ainsi que le code reçu par email pour réinitialiser votre mot de passe.",
+        confirmResetPassword: "Confirmer la réinitialisation du mot de passe",
+        confirmResetPasswordTitle: "Confirmer la réinitialisation de votre mot de passe",
       },
     },
   },
