@@ -14,6 +14,7 @@ import { setAuthData } from './store/authSlice';
 import OtpConfirmationPage from './pages/OtpConfirmationPage/OtpConfirmationPage.tsx';
 import ForgetPasswordPage from './pages/ForgetPasswordPage/ForgetPasswordPage.tsx';
 import ConfirmResetPasswordPage from './pages/ConfirmResetPasswordPage/ConfirmResetPasswordPage.tsx';
+import CategoryPage from './pages/CategoryPage/CategoryPage.tsx';
 
 function App() {
   const dispatch = useDispatch();
@@ -38,6 +39,7 @@ function App() {
         { path: '/', element: <HomePage /> },
         { path: '/destination', element: <DestinationPage /> },
         { path: '/itinerary', element: <ItineraryPage /> },
+        { path: '/category', element: <CategoryPage /> },
         { path: '/contact', element: <ContactPage /> },
         { path: '/signin', element: <SignInPage /> },
         { path: '/login', element: <LoginPage /> },
