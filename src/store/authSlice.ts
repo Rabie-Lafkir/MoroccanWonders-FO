@@ -1,4 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import axios from 'axios';
+import { useDispatch } from 'react-redux';
+
 
 interface AuthState {
   userId: string | null;
@@ -6,6 +9,7 @@ interface AuthState {
   refreshToken: string | null;
 }
 
+const API_URL = import.meta.env.VITE_API_URL;
 const initialState: AuthState = {
   userId: null,
   accessToken: null,
@@ -24,6 +28,17 @@ const authSlice = createSlice({
       localStorage.setItem('refreshToken', action.payload.refreshToken!);
     },
     clearAuthData: (state) => {
+      const accessToken = state.accessToken;
+      if (accessToken) {
+        axios.delete(`${API_URL}/account/logout`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        }).catch(error => {
+          console.error('Error during logout:', error);
+        });
+      }
+
       state.userId = null;
       state.accessToken = null;
       state.refreshToken = null;

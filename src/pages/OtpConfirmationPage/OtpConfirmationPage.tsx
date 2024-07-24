@@ -1,10 +1,15 @@
 import { Helmet } from "react-helmet";
 import { useTranslation } from "react-i18next";
 import PageHeader from "../../components/PageHeader/PageHeader";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useContext, useState } from "react";
 import { InputOtp } from "primereact/inputotp";
 import axios from "axios";
+import { ToastContext } from "../../helpers/context/ToastContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons/faSpinner";
+import { useDispatch } from "react-redux";
+import { startLoading, stopLoading } from "../../store/loadingSlice";
 
 export default function OtpConfirmationPage() {
   const { t } = useTranslation();
@@ -14,11 +19,15 @@ export default function OtpConfirmationPage() {
   const [token, setTokens] = useState<string | number | undefined>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const toastContext = useContext(ToastContext);
+  const dispatch = useDispatch();
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    dispatch(startLoading())
 
     try {
       const response = await axios.post(
@@ -30,21 +39,37 @@ export default function OtpConfirmationPage() {
       );
       // Handle success (e.g., navigate to a new page, display a success message, etc.)
       console.log("OTP confirmation successful", response.data);
+      toastContext?.showToast(
+        "success",
+        t("success"),
+        t("otpConfirmationSuccess")
+      );
+      dispatch(stopLoading())
       navigate("/login"); // Redirect to sign-in page after successful OTP confirmation
     } catch (error) {
       console.error("OTP confirmation failed", error);
       setError("OTP confirmation failed. Please try again.");
+      toastContext?.showToast(
+        "error",
+        t("error"),
+        t("otpConfirmationFailure")
+      );
+      dispatch(stopLoading())
     } finally {
       setLoading(false);
+      dispatch(stopLoading())
     }
   };
 
-
-  const resendConfirmationCode = async (email:string) => {
+  const resendConfirmationCode = async (email: string) => {
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/account/resend_confirm_code`, null, {
-        params: { username: email },
-      });
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/account/resend_confirm_code`,
+        null,
+        {
+          params: { username: email },
+        }
+      );
       console.log("Resend confirmation code successful", response.data);
       return response.data; // Return the response data if needed
     } catch (error) {
@@ -52,17 +77,15 @@ export default function OtpConfirmationPage() {
       throw error; // Throw the error to be handled by the caller
     }
   };
-  
 
   const handleResendCode = async () => {
-      try {
-        await resendConfirmationCode(email);
-        alert("Confirmation code resent successfully");
-      } catch (error) {
-        alert("Failed to resend confirmation code");
-      }
-    };
-    
+    try {
+      await resendConfirmationCode(email);
+      alert("Confirmation code resent successfully");
+    } catch (error) {
+      alert("Failed to resend confirmation code");
+    }
+  };
 
   return (
     <>
@@ -114,16 +137,13 @@ export default function OtpConfirmationPage() {
                         className="thm-btn contact-one__btn"
                         disabled={loading}
                       >
-                        {loading ? t("confirming") : t("confirm")}
+                        {loading ? <FontAwesomeIcon icon={faSpinner} spin /> : t("confirm")}
                       </button>
                     </div>
-                    <a href="javascript:void(0)" onClick={handleResendCode}>Resend code</a>
+                    <a href="javascript:void(0)" onClick={handleResendCode}>
+                      Resend code
+                    </a>
                   </div>
-                  {error && (
-                    <div className="col-md-12">
-                      <p className="error-message">{error}</p>
-                    </div>
-                  )}
                 </div>
               </form>
             </div>

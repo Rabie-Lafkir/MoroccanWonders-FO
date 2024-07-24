@@ -1,0 +1,29 @@
+.country-select {
+    width: 100%;
+    height: 74px;
+    display: block;
+    border: none;
+    outline: none;
+    background-color: #eceeef;
+    font-size: 16px;
+    font-weight: 500;
+    color: #9ca3a9;
+    padding-left: 30px;
+}
+
+.input-group-icon {
+    cursor: pointer;
+    margin-left: -50px;
+    align-self: center;
+}
+
+.input-group.error input,
+.input-group.error select {
+    border: 1px solid red !important; 
+}
+
+.error-message {
+    color: red;
+    font-size: 0.875em;
+    margin-top: 0.25em;
+}

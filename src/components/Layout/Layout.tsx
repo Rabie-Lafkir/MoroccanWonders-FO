@@ -9,6 +9,9 @@ import { MenuItem } from "primereact/menuitem";
 import { useDispatch, useSelector } from "react-redux";
 import { clearAuthData } from "../../store/authSlice";
 import { RootState } from "../../store/store";
+import { ToastProvider } from "../../helpers/context/ToastContext";
+import { ProgressBar } from 'primereact/progressbar'; // Import ProgressBar
+
 
 export default function Layout() {
   const { t, i18n } = useTranslation();
@@ -19,6 +22,8 @@ export default function Layout() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state: RootState) => state.auth.accessToken);
+  const isLoading = useSelector((state: RootState) => state.loading.isLoading); // Access loading state
+
 
   const handleLogout = () => {
     dispatch(clearAuthData());
@@ -95,6 +100,7 @@ export default function Layout() {
   }
 
   return (
+    <ToastProvider>
     <div className="layout">
       <div className="site-header__header-one-wrap">
         <div className="topbar-one">
@@ -116,24 +122,26 @@ export default function Layout() {
                   <i className="fab fa-instagram"></i>
                 </Link>
               </div>
-                {!isLoggedIn ? (
-                  <>
+              {!isLoggedIn ? (
+                <>
                   <Link
-                onClick={scrollToTop}
-                to="/login"
-                className="topbar-one__guide-btn"
-              >
-                {t("login")}
-              </Link>
-              <Link
-                onClick={scrollToTop}
-                to="/signin"
-                className="topbar-one__guide-btn"
-              >
-                {t("signin")}
-              </Link>
-                  </>
-                ) : '' }
+                    onClick={scrollToTop}
+                    to="/login"
+                    className="topbar-one__guide-btn"
+                  >
+                    {t("login")}
+                  </Link>
+                  <Link
+                    onClick={scrollToTop}
+                    to="/signin"
+                    className="topbar-one__guide-btn"
+                  >
+                    {t("signin")}
+                  </Link>
+                </>
+              ) : (
+                ""
+              )}
             </div>
           </div>
         </div>
@@ -229,6 +237,7 @@ export default function Layout() {
             </div>
           </nav>
         </header>
+        {isLoading && <ProgressBar mode="indeterminate" style={{ height: '6px' }} />} {/* Add ProgressBar here */}
       </div>
 
       <main>
@@ -241,7 +250,11 @@ export default function Layout() {
         <div className="container">
           <div className="row">
             <div className="footer-widget__column footer-widget__about">
-              <Link onClick={scrollToTop} to="/" className="footer-widget__logo">
+              <Link
+                onClick={scrollToTop}
+                to="/"
+                className="footer-widget__logo"
+              >
                 <img src="src/assets/images/logo.png" width="230" alt="" />
               </Link>
               <p>{t("descriptionFooter")}</p>
@@ -407,5 +420,6 @@ export default function Layout() {
         </div>
       </div>
     </div>
+    </ToastProvider>
   );
 }

@@ -1,7 +1,7 @@
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const refreshToken = async (refreshToken: string) => {
-  const response = await fetch(`${API_URL}/auth/refresh`, {
+  const response = await fetch(`${API_URL}/auth/refresh_token`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
