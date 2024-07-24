@@ -10,7 +10,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { clearAuthData } from "../../store/authSlice";
 import { RootState } from "../../store/store";
 import { ToastProvider } from "../../helpers/context/ToastContext";
-import { ProgressBar } from 'primereact/progressbar'; // Import ProgressBar
+import { ProgressBar } from 'primereact/progressbar'; 
+import { startLoading, stopLoading } from "../../store/loadingSlice";
 
 
 export default function Layout() {
@@ -22,12 +23,14 @@ export default function Layout() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state: RootState) => state.auth.accessToken);
-  const isLoading = useSelector((state: RootState) => state.loading.isLoading); // Access loading state
+  const isLoading = useSelector((state: RootState) => state.loading.isLoading); 
 
 
   const handleLogout = () => {
     dispatch(clearAuthData());
-    navigate("/login");
+    dispatch(startLoading())
+    setTimeout(() => {dispatch(stopLoading())
+    navigate("/login")}, 500)
   };
 
   const items: MenuItem[] = [
@@ -44,7 +47,7 @@ export default function Layout() {
         {
           label: "Logout",
           icon: "pi pi-sign-out",
-          command: handleLogout,
+          command: handleLogout
         },
       ],
     },
