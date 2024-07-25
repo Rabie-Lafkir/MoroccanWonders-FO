@@ -53,7 +53,7 @@ export default function LoginPage() {
    */
   const validatePassword = (password: string) => {
     // Minimum eight characters, at least one letter, one number, and one special character
-    const re = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    const re = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     return re.test(password);
   };
 
@@ -234,7 +234,7 @@ export default function LoginPage() {
                   <div className="col-md-12">
                     <p>
                       {t("redirectSignup")}
-                      <Link to="/signin">{t("signin")}</Link>
+                      <Link to="/signup">{t("signup")}</Link>
                     </p>
                   </div>
                 </div>

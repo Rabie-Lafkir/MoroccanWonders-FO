@@ -6,8 +6,8 @@ i18n.use(initReactI18next).init({
     en: {
       translation: {
         login: "Login",
-        loginFailed : "Login failed. Please try again.",
-        signin: "Sign in",
+        loginFailed: "Login failed. Please try again.",
+        signup: "Sign up",
         hero1: "Find your",
         hero2: "next tour",
         hero3: "Where would you like to go ?",
@@ -47,6 +47,9 @@ i18n.use(initReactI18next).init({
           "Welcome! To verify your identity and secure your account, please enter the One-Time Password (OTP) sent to your email or phone. Simply type the OTP into the field below and click 'Confirm'. If you encounter any issues, our support team is here to help.",
         otpConfirmationSuccess: "Your account has been activated",
         otpConfirmationFailure: "Your account has not been activated",
+        otpResendSuccess: "The code has been sent to your email",
+        optResendFailure:
+          "The code has not been sent to your email, please try again later!",
         submit: "Submit",
         forgetPassword: "Forget password ?",
         forgotPasswordDesc:
@@ -59,11 +62,17 @@ i18n.use(initReactI18next).init({
           "Please enter your new password and the code you received via email to reset your password.",
         confirmResetPassword: "Confirm reset password",
         confirmResetPasswordTitle: "Confirm your password Modification",
+        resetPasswordSuccess:
+          "Password reset instructions have been sent to your email.",
+        resetPasswordFailure:
+          "Failed to send password reset instructions. Please try again later.",
+        resetPasswordConfirmedMessage: "Your password has been changed",
+        resetPasswordFailedMessage: "Your password has not been changed",
         validation: {
           required: "This field is required",
           invalidEmail: "Invalid email format",
           passwordRequirements:
-            "Password must be at least 8 characters long and include at least one letter, one number, and one special character",
+            "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.",
           passwordMismatch: "Passwords do not match",
         },
         success: "Success",
@@ -75,8 +84,8 @@ i18n.use(initReactI18next).init({
     fr: {
       translation: {
         login: "Connexion",
-        loginFailed : "Connexion échouée. Réessayez plus tard.",
-        signin: "Inscription",
+        loginFailed: "Connexion échouée. Réessayez plus tard.",
+        signup: "Inscription",
         hero1: "Trouvez votre",
         hero2: "prochain tour",
         hero3: "Où aimerais-tu aller ?",
@@ -117,6 +126,9 @@ i18n.use(initReactI18next).init({
           "Bienvenue ! Pour vérifier votre identité et sécuriser votre compte, veuillez entrer le mot de passe à usage unique (OTP) envoyé à votre email ou téléphone. Tapez simplement l’OTP dans le champ ci-dessous et cliquez sur 'Confirmer'. Si vous rencontrez des problèmes, notre équipe de support est là pour vous aider.",
         otpConfirmationSuccess: "Votre compte a été activé",
         otpConfirmationFailure: "Votre compte n'a pas été activé",
+        otpResendSuccess: "Le code a été envoyé à votre adresse e-mail.",
+        otpResendFailure:
+          "Le code n'a pas été envoyé à votre adresse e-mail, veuillez réessayer plus tard !",
         submit: "Envoyer",
         forgetPassword: "Mot de passe oublié ?",
         forgotPasswordDesc:
@@ -130,11 +142,17 @@ i18n.use(initReactI18next).init({
         confirmResetPassword: "Confirmer la réinitialisation du mot de passe",
         confirmResetPasswordTitle:
           "Confirmer la réinitialisation de votre mot de passe",
+        resetPasswordSuccess:
+          "Les instructions de réinitialisation de mot de passe ont été envoyées à votre adresse e-mail.",
+        resetPasswordFailure:
+          "L'envoi des instructions de réinitialisation du mot de passe a échoué. Veuillez réessayer plus tard.",
+        resetPasswordConfirmedMessage: "Votre mot de passe a été changé",
+        resetPasswordFailedMessage: "Votre mot de passe n'a pas été changé",
         validation: {
           required: "Ce champ est requis",
           invalidEmail: "Format d'email invalide",
           passwordRequirements:
-            "Le mot de passe doit comporter au moins 8 caractères et inclure au moins une lettre, un chiffre et un caractère spécial",
+            "Le mot de passe doit comporter au moins 8 caractères et inclure au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial.",
           passwordMismatch: "Les mots de passe ne correspondent pas",
         },
         success: "Succès",

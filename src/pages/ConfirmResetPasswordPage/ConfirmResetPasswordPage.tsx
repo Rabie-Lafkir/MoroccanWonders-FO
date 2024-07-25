@@ -1,9 +1,13 @@
 import { Helmet } from "react-helmet";
 import { useTranslation } from "react-i18next";
-import PageHeader from "../../components/PageHeader/PageHeader";
-import { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useContext, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { ToastContext } from "../../helpers/context/ToastContext";
+import { useDispatch } from "react-redux";
+import { startLoading, stopLoading } from "../../store/loadingSlice";
 
 export default function ConfirmResetPasswordPage() {
   const { t } = useTranslation();
@@ -14,6 +18,9 @@ export default function ConfirmResetPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const toastContext = useContext(ToastContext)
+  const dispatch = useDispatch();
+  const navigate = useNavigate()
 
   const handleNewPasswordChange = (e) => setNewPassword(e.target.value);
   const handleConfirmationCodeChange = (e) => setConfirmationCode(e.target.value);
@@ -23,7 +30,7 @@ export default function ConfirmResetPasswordPage() {
     setLoading(true);
     setError("");
     setSuccess("");
-
+    dispatch(startLoading())
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/account/confirm_reset_password`, {
         username: email,
@@ -32,11 +39,26 @@ export default function ConfirmResetPasswordPage() {
       });
       console.log("Password reset confirmation successful", response.data);
       setSuccess("Your password has been reset successfully.");
+      dispatch(stopLoading())
+      toastContext?.showToast(
+        "success",
+        t("success"),
+        t("resetPasswordConfirmedMessage")
+      );
+      navigate('/login')
+      
     } catch (error) {
       console.error("Password reset confirmation failed", error);
       setError("Failed to reset password. Please try again.");
+      dispatch(stopLoading())
+      toastContext?.showToast(
+        "error",
+        t("error"),
+        t("resetPasswordFailedMessage")
+      );
     } finally {
       setLoading(false);
+      dispatch(stopLoading())
     }
   };
 
@@ -45,14 +67,6 @@ export default function ConfirmResetPasswordPage() {
       <Helmet>
         <title>{`${t('confirmResetPassword')} - Moroccan Wonders`}</title>
       </Helmet>
-      {/* <PageHeader
-        backgroundImageUrl="assets/images/backgrounds/page-header-contact.jpg"
-        pageTitle={t('resetPassword')}
-        breadcrumbItems={[
-          { label: t('home'), url: '/' },
-          { label: t('resetPassword') },
-        ]}
-      /> */}
       <section className="contact-one" style={{ marginTop: '80px' }}>
         <div className="container">
           <div className="row">
@@ -110,12 +124,10 @@ export default function ConfirmResetPasswordPage() {
                         className="thm-btn contact-one__btn"
                         disabled={loading}
                       >
-                        {loading ? t('submitting') : t('submit')}
+                        {loading ? <FontAwesomeIcon icon={faSpinner} spin /> : t('submit')}
                       </button>
                     </div>
                   </div>
-                  {error && <div className="col-md-12"><p className="error-message">{error}</p></div>}
-                  {success && <div className="col-md-12"><p className="success-message">{success}</p></div>}
                 </div>
               </form>
             </div>

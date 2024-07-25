@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import useScrollToTop from "../../helpers/scrollToTop";
 import axios from "axios";
-import "./SignInPage.css";
+import "./SignUpPage.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { ToastContext } from "../../helpers/context/ToastContext";
@@ -33,7 +33,7 @@ interface Errors {
   terms?: string;
 }
 
-export default function SignInPage() {
+export default function SignUpPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -79,7 +79,7 @@ export default function SignInPage() {
 
   const validatePassword = (password: string) => {
     // Minimum eight characters, at least one letter, one number, and one special character
-    const re = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    const re = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     return re.test(password);
   };
 
@@ -89,8 +89,7 @@ export default function SignInPage() {
     if (!formData.lastName) newErrors.lastName = t("validation.required");
     if (!formData.email || !validateEmail(formData.email))
       newErrors.email = t("validation.invalidEmail");
-    if (!formData.phoneNumber)
-      newErrors.phoneNumber = t("validation.required");
+    if (!formData.phoneNumber) newErrors.phoneNumber = t("validation.required");
     if (!formData.originCountry)
       newErrors.originCountry = t("validation.required");
     if (!formData.password || !validatePassword(formData.password))
@@ -103,7 +102,9 @@ export default function SignInPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
@@ -150,7 +151,7 @@ export default function SignInPage() {
   return (
     <div>
       <Helmet>
-        <title>{`${t("signin")} - Moroccan Wonders`}</title>
+        <title>{`${t("signup")} - Moroccan Wonders`}</title>
       </Helmet>
       <section className="contact-one" style={{ marginTop: "40px" }}>
         <div className="container">
@@ -158,7 +159,7 @@ export default function SignInPage() {
             <div className="col-lg-5">
               <div className="contact-one__content">
                 <div className="block-title text-left">
-                  <p>{t("signin")}</p>
+                  <p>{t("signup")}</p>
                   <h3>{t("titleSignin")}</h3>
                 </div>
                 <div className="contact-one__content-text">
@@ -167,10 +168,16 @@ export default function SignInPage() {
               </div>
             </div>
             <div className="col-lg-7">
-              <form className="contact-one__form" onSubmit={handleSubmit} noValidate>
+              <form
+                className="contact-one__form"
+                onSubmit={handleSubmit}
+                noValidate
+              >
                 <div className="row low-gutters">
                   <div className="col-md-6">
-                    <div className={`input-group ${errors.firstName ? "error" : ""}`}>
+                    <div
+                      className={`input-group ${errors.firstName ? "error" : ""}`}
+                    >
                       <input
                         type="text"
                         name="firstName"
@@ -184,7 +191,9 @@ export default function SignInPage() {
                     </div>
                   </div>
                   <div className="col-md-6">
-                    <div className={`input-group ${errors.lastName ? "error" : ""}`}>
+                    <div
+                      className={`input-group ${errors.lastName ? "error" : ""}`}
+                    >
                       <input
                         type="text"
                         name="lastName"
@@ -198,7 +207,9 @@ export default function SignInPage() {
                     </div>
                   </div>
                   <div className="col-md-6">
-                    <div className={`input-group ${errors.email ? "error" : ""}`}>
+                    <div
+                      className={`input-group ${errors.email ? "error" : ""}`}
+                    >
                       <input
                         type="email"
                         name="email"
@@ -212,7 +223,9 @@ export default function SignInPage() {
                     </div>
                   </div>
                   <div className="col-md-6">
-                    <div className={`input-group ${errors.phoneNumber ? "error" : ""}`}>
+                    <div
+                      className={`input-group ${errors.phoneNumber ? "error" : ""}`}
+                    >
                       <input
                         type="text"
                         name="phoneNumber"
@@ -221,12 +234,16 @@ export default function SignInPage() {
                         onChange={handleChange}
                       />
                       {errors.phoneNumber && (
-                        <div className="error-message">{errors.phoneNumber}</div>
+                        <div className="error-message">
+                          {errors.phoneNumber}
+                        </div>
                       )}
                     </div>
                   </div>
                   <div className="col-md-6">
-                    <div className={`input-group ${errors.password ? "error" : ""}`}>
+                    <div
+                      className={`input-group ${errors.password ? "error" : ""}`}
+                    >
                       <input
                         type={showPassword ? "text" : "password"}
                         name="password"
@@ -248,7 +265,9 @@ export default function SignInPage() {
                     </div>
                   </div>
                   <div className="col-md-6">
-                    <div className={`input-group ${errors.confirmPassword ? "error" : ""}`}>
+                    <div
+                      className={`input-group ${errors.confirmPassword ? "error" : ""}`}
+                    >
                       <input
                         type={showPassword ? "text" : "password"}
                         name="confirmPassword"
@@ -265,12 +284,16 @@ export default function SignInPage() {
                         />
                       </span>
                       {errors.confirmPassword && (
-                        <div className="error-message">{errors.confirmPassword}</div>
+                        <div className="error-message">
+                          {errors.confirmPassword}
+                        </div>
                       )}
                     </div>
                   </div>
                   <div className="col-md-12">
-                    <div className={`input-group ${errors.originCountry ? "error" : ""}`}>
+                    <div
+                      className={`input-group ${errors.originCountry ? "error" : ""}`}
+                    >
                       <select
                         className="w-100 country-select"
                         name="originCountry"
@@ -287,12 +310,16 @@ export default function SignInPage() {
                         ))}
                       </select>
                       {errors.originCountry && (
-                        <div className="error-message">{errors.originCountry}</div>
+                        <div className="error-message">
+                          {errors.originCountry}
+                        </div>
                       )}
                     </div>
                   </div>
                   <div className="col-md-12">
-                    <div className={`input-group ${errors.terms ? "error" : ""}`}>
+                    <div
+                      className={`input-group ${errors.terms ? "error" : ""}`}
+                    >
                       <input
                         type="checkbox"
                         name="terms"
@@ -314,7 +341,11 @@ export default function SignInPage() {
                         className="thm-btn contact-one__btn"
                         disabled={loading}
                       >
-                        {loading ? <FontAwesomeIcon icon={faSpinner} spin /> : t("signin")}
+                        {loading ? (
+                          <FontAwesomeIcon icon={faSpinner} spin />
+                        ) : (
+                          t("signup")
+                        )}
                       </button>
                     </div>
                   </div>

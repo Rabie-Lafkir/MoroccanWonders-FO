@@ -3,7 +3,6 @@ import { useDispatch } from 'react-redux';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import './App.css';
 import HomePage from './pages/HomePage/HomePage.tsx';
-import SignInPage from './pages/SignInPage/SignInPage.tsx';
 import Layout from './components/Layout/Layout.tsx';
 import ContactPage from './pages/ContactPage/ContactPage.tsx';
 import LoginPage from './pages/LogInPage/LoginPage.tsx';
@@ -15,6 +14,7 @@ import OtpConfirmationPage from './pages/OtpConfirmationPage/OtpConfirmationPage
 import ForgetPasswordPage from './pages/ForgetPasswordPage/ForgetPasswordPage.tsx';
 import ConfirmResetPasswordPage from './pages/ConfirmResetPasswordPage/ConfirmResetPasswordPage.tsx';
 import CategoryPage from './pages/CategoryPage/CategoryPage.tsx';
+import SignUpPage from './pages/SignUpPage/SignUpPage.tsx';
 
 function App() {
   const dispatch = useDispatch();
@@ -41,7 +41,7 @@ function App() {
         { path: '/itinerary', element: <ItineraryPage /> },
         { path: '/category', element: <CategoryPage /> },
         { path: '/contact', element: <ContactPage /> },
-        { path: '/signin', element: <SignInPage /> },
+        { path: '/signup', element: <SignUpPage /> },
         { path: '/login', element: <LoginPage /> },
         { path: '/confirmation', element: <OtpConfirmationPage /> },
         { path: '/forget-password', element: <ForgetPasswordPage /> },

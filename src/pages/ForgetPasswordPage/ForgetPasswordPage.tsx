@@ -1,9 +1,13 @@
 import { Helmet } from "react-helmet";
 import { useTranslation } from "react-i18next";
-import PageHeader from "../../components/PageHeader/PageHeader";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { ToastContext } from "../../helpers/context/ToastContext";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons/faSpinner";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useDispatch } from "react-redux";
+import { startLoading, stopLoading } from "../../store/loadingSlice";
 
 export default function ForgetPasswordPage() {
   const { t } = useTranslation();
@@ -13,6 +17,8 @@ export default function ForgetPasswordPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
+  const toastContext = useContext(ToastContext);
+  const dispatch =  useDispatch();
 
 
   const handleEmailChange = (e) => setEmail(e.target.value);
@@ -22,6 +28,7 @@ export default function ForgetPasswordPage() {
     setLoading(true);
     setError("");
     setSuccess("");
+    dispatch(startLoading())
 
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/account/reset_password`, null, {
@@ -29,13 +36,26 @@ export default function ForgetPasswordPage() {
       });
       console.log("Password reset initiation successful", response.data);
       setSuccess("Password reset instructions have been sent to your email.");
+      toastContext?.showToast(
+        "success",
+        t("success"),
+        t("resetPasswordSuccess")
+      );
+      dispatch(stopLoading())
       // Navigate to ConfirmResetPasswordPage and pass email as state
       navigate('/confirm-reset-password', { state: { email } });
     } catch (error) {
       console.error("Password reset initiation failed", error);
       setError("Failed to initiate password reset. Please try again.");
+      dispatch(stopLoading())
+      toastContext?.showToast(
+        "error",
+        t("error"),
+        t("resetPasswordFailure")
+      );
     } finally {
       setLoading(false);
+      dispatch(stopLoading())
     }
   };
 
@@ -44,14 +64,6 @@ export default function ForgetPasswordPage() {
       <Helmet>
         <title>{`${t('resetPassword')} - Moroccan Wonders`}</title>
       </Helmet>
-      {/* <PageHeader
-        backgroundImageUrl="assets/images/backgrounds/page-header-contact.jpg"
-        pageTitle={t('login')}
-        breadcrumbItems={[
-          { label: t('home'), url: '/' },
-          { label: t('login') },
-        ]}
-      /> */}
       <section className="contact-one" style={{ marginTop: '80px' }}>
         <div className="container">
           <div className="row">
@@ -87,12 +99,10 @@ export default function ForgetPasswordPage() {
                         className="thm-btn contact-one__btn"
                         disabled={loading}
                       >
-                        {loading ? t('submitting') : t('submit')}
+                        {loading ? <FontAwesomeIcon icon={faSpinner} spin /> : t('submit')}
                       </button>
                     </div>
                   </div>
-                  {error && <div className="col-md-12"><p className="error-message">{error}</p></div>}
-                  {success && <div className="col-md-12"><p className="success-message">{success}</p></div>}
                 </div>
               </form>
             </div>

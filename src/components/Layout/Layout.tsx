@@ -136,10 +136,10 @@ export default function Layout() {
                   </Link>
                   <Link
                     onClick={scrollToTop}
-                    to="/signin"
+                    to="/signup"
                     className="topbar-one__guide-btn"
                   >
-                    {t("signin")}
+                    {t("signup")}
                   </Link>
                 </>
               ) : (

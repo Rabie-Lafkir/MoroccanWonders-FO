@@ -1,6 +1,5 @@
 import { Helmet } from "react-helmet";
 import { useTranslation } from "react-i18next";
-import PageHeader from "../../components/PageHeader/PageHeader";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useContext, useState } from "react";
 import { InputOtp } from "primereact/inputotp";
@@ -22,12 +21,11 @@ export default function OtpConfirmationPage() {
   const toastContext = useContext(ToastContext);
   const dispatch = useDispatch();
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
-    dispatch(startLoading())
+    dispatch(startLoading());
 
     try {
       const response = await axios.post(
@@ -44,24 +42,21 @@ export default function OtpConfirmationPage() {
         t("success"),
         t("otpConfirmationSuccess")
       );
-      dispatch(stopLoading())
+      dispatch(stopLoading());
       navigate("/login"); // Redirect to sign-in page after successful OTP confirmation
     } catch (error) {
       console.error("OTP confirmation failed", error);
       setError("OTP confirmation failed. Please try again.");
-      toastContext?.showToast(
-        "error",
-        t("error"),
-        t("otpConfirmationFailure")
-      );
-      dispatch(stopLoading())
+      toastContext?.showToast("error", t("error"), t("otpConfirmationFailure"));
+      dispatch(stopLoading());
     } finally {
       setLoading(false);
-      dispatch(stopLoading())
+      dispatch(stopLoading());
     }
   };
 
   const resendConfirmationCode = async (email: string) => {
+    dispatch(startLoading())
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/account/resend_confirm_code`,
@@ -71,10 +66,23 @@ export default function OtpConfirmationPage() {
         }
       );
       console.log("Resend confirmation code successful", response.data);
+      toastContext?.showToast(
+        "success",
+        t("success"),
+        t("otpResendSuccess")
+      );
+      dispatch(stopLoading())
       return response.data; // Return the response data if needed
     } catch (error) {
       console.error("Resend confirmation code failed", error);
+      toastContext?.showToast(
+        "error",
+        t("error"),
+        t("otpResendFailure")
+      );
+      dispatch(stopLoading())
       throw error; // Throw the error to be handled by the caller
+      
     }
   };
 
@@ -92,15 +100,6 @@ export default function OtpConfirmationPage() {
       <Helmet>
         <title>{`${t("confirmationEmail")} - Moroccan Wonders`}</title>
       </Helmet>
-      <PageHeader
-        backgroundImageUrl="assets/images/backgrounds/page-header-contact.jpg"
-        pageTitle={t("confirmationEmail")}
-        breadcrumbItems={[
-          { label: t("signin"), url: "/" },
-          { label: t("confirmationEmail") },
-        ]}
-      />
-
       <section className="contact-one" style={{ marginTop: "80px" }}>
         <div className="container">
           <div className="row">
@@ -137,7 +136,11 @@ export default function OtpConfirmationPage() {
                         className="thm-btn contact-one__btn"
                         disabled={loading}
                       >
-                        {loading ? <FontAwesomeIcon icon={faSpinner} spin /> : t("confirm")}
+                        {loading ? (
+                          <FontAwesomeIcon icon={faSpinner} spin />
+                        ) : (
+                          t("confirm")
+                        )}
                       </button>
                     </div>
                     <a href="javascript:void(0)" onClick={handleResendCode}>
