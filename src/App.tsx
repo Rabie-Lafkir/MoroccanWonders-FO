@@ -15,6 +15,7 @@ import ForgetPasswordPage from './pages/ForgetPasswordPage/ForgetPasswordPage.ts
 import ConfirmResetPasswordPage from './pages/ConfirmResetPasswordPage/ConfirmResetPasswordPage.tsx';
 import CategoryPage from './pages/CategoryPage/CategoryPage.tsx';
 import SignUpPage from './pages/SignUpPage/SignUpPage.tsx';
+import ProfilePage from './pages/ProfilePages/ProfilePage/ProfilePage.tsx';
 
 function App() {
   const dispatch = useDispatch();
@@ -47,6 +48,7 @@ function App() {
         { path: '/confirmation', element: <OtpConfirmationPage /> },
         { path: '/forget-password', element: <ForgetPasswordPage /> },
         { path: '/confirm-reset-password', element: <ConfirmResetPasswordPage /> },
+        {path: '/profile', element: <ProfilePage/>}
 
       ],
     },

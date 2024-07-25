@@ -1,0 +1,21 @@
+.p-sidebar .p-sidebar-content{
+    padding-left: 0;
+    padding-right: 0;
+}
+  
+  .sidebar-menu {
+    list-style-type: none;
+    padding: 0;
+    width: 100%;
+  }
+  
+  .sidebar-menu li {
+    margin: 10px 0;
+    
+  }
+  
+  .sidebar-menu a {
+    text-decoration: none;
+    color: #333;
+  }
+  
