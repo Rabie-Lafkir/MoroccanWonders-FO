@@ -22,8 +22,9 @@ function App() {
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
     const refreshToken = localStorage.getItem('refreshToken');
-    if (accessToken && refreshToken) {
-      dispatch(setAuthData({ userId: 'decodedUserId', accessToken, refreshToken }));
+    const user = JSON.parse(localStorage.getItem('user')!)
+    if (accessToken && refreshToken && user) {
+      dispatch(setAuthData({ user, accessToken, refreshToken }));
     }
   }, [dispatch]);
 

@@ -6,7 +6,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { setAuthData } from "../../store/authSlice";
 import axiosInstance from "../../helpers/axiosInstance";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faEyeSlash, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import {
+  faEye,
+  faEyeSlash,
+  faSpinner,
+} from "@fortawesome/free-solid-svg-icons";
 import { ToastContext } from "../../helpers/context/ToastContext";
 import { startLoading, stopLoading } from "../../store/loadingSlice";
 import "./LoginPage.css";
@@ -18,7 +22,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [errors, setErrors] = useState({ username: "", password: "" });
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const toastContext = useContext(ToastContext);
@@ -38,8 +42,8 @@ export default function LoginPage() {
 
   /**
    * Regex for email validation
-   * @param email 
-   * @returns 
+   * @param email
+   * @returns
    */
   const validateEmail = (email: string) => {
     const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
@@ -48,19 +52,20 @@ export default function LoginPage() {
 
   /**
    * Regex for password validation
-   * @param password 
-   * @returns 
+   * @param password
+   * @returns
    */
   const validatePassword = (password: string) => {
     // Minimum eight characters, at least one letter, one number, and one special character
-    const re = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    const re =
+      /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     return re.test(password);
   };
 
   /**
    * handleLogin
-   * @param e 
-   * @returns 
+   * @param e
+   * @returns
    */
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,17 +86,29 @@ export default function LoginPage() {
     }
 
     dispatch(startLoading());
-    setLoading(true)
+    setLoading(true);
     try {
       const response = await axiosInstance.post("/account/login", {
         username,
         password,
       });
       const data = response.data;
+      console.log(data);
 
       dispatch(
         setAuthData({
-          userId: data.userId,
+          user: {
+            firstName: data.firstName,
+            lastName: data.lastName,
+            gender: data.gender,
+            username: data.username,
+            emailVerified: data.emailVerified,
+            phoneNumber: data.phoneNumber,
+            phoneNumberVerified: data.phoneNumberVerified,
+            originCountry: data.originCountry,
+            image: data.image,
+            authorities: data.authorities,
+          },
           accessToken: data.accessToken,
           refreshToken: data.refreshToken,
         })
@@ -104,15 +121,15 @@ export default function LoginPage() {
         localStorage.removeItem("rememberMeUsername");
         localStorage.removeItem("rememberMePassword");
       }
-      setLoading(false)
+      setLoading(false);
       navigate("/");
     } catch (error) {
       toastContext?.showToast("error", t("error"), t("loginFailed"));
-      setLoading(false)
+      setLoading(false);
       console.log(error);
     } finally {
       dispatch(stopLoading());
-      setLoading(false)
+      setLoading(false);
     }
   };
 
@@ -153,7 +170,9 @@ export default function LoginPage() {
               <form className="contact-one__form" onSubmit={handleLogin}>
                 <div className="row low-gutters">
                   <div className="col-md-12">
-                    <div className={`input-group ${errors.username ? "error" : ""}`}>
+                    <div
+                      className={`input-group ${errors.username ? "error" : ""}`}
+                    >
                       <input
                         name="username"
                         type="text"
@@ -175,7 +194,9 @@ export default function LoginPage() {
                     </div>
                   </div>
                   <div className="col-md-12">
-                    <div className={`input-group ${errors.password ? "error" : ""}`}>
+                    <div
+                      className={`input-group ${errors.password ? "error" : ""}`}
+                    >
                       <input
                         name="password"
                         type={showPassword ? "text" : "password"}
@@ -187,7 +208,7 @@ export default function LoginPage() {
                             ...prevErrors,
                             password: validatePassword(e.target.value)
                               ? ""
-                              :  t("validation.passwordRequirements"),
+                              : t("validation.passwordRequirements"),
                           }));
                         }}
                       />
@@ -221,7 +242,11 @@ export default function LoginPage() {
                         type="submit"
                         className="thm-btn contact-one__btn"
                       >
-                        {loading? <FontAwesomeIcon icon={faSpinner} spin /> : t("login")}
+                        {loading ? (
+                          <FontAwesomeIcon icon={faSpinner} spin />
+                        ) : (
+                          t("login")
+                        )}
                       </button>
                     </div>
                     <a

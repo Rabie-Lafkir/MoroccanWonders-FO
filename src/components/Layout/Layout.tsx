@@ -3,7 +3,6 @@ import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import useScrollToTop from "../../helpers/scrollToTop";
 import "./Layout.css";
-import { Avatar } from "primereact/avatar";
 import { Menu } from "primereact/menu";
 import { MenuItem } from "primereact/menuitem";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,6 +11,7 @@ import { RootState } from "../../store/store";
 import { ToastProvider } from "../../helpers/context/ToastContext";
 import { ProgressBar } from 'primereact/progressbar'; 
 import { startLoading, stopLoading } from "../../store/loadingSlice";
+import AvatarCustom from "../AvatarCustom/AvatarCustom";
 
 
 export default function Layout() {
@@ -24,6 +24,7 @@ export default function Layout() {
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state: RootState) => state.auth.accessToken);
   const isLoading = useSelector((state: RootState) => state.loading.isLoading); 
+  const user = useSelector((state: RootState ) => state.auth.user)
 
 
   const handleLogout = () => {
@@ -217,20 +218,18 @@ export default function Layout() {
                 {isLoggedIn ? (
                   <div>
                     <Menu
+                      className="mt-2"
                       model={items}
                       popup
                       ref={menuRight}
                       id="popup_menu_right"
                       popupAlignment="right"
                     />
-                    <Avatar
-                      label="SM"
-                      className="mr-2"
-                      style={{ backgroundColor: "#2196F3", color: "#ffffff" }}
-                      shape="circle"
-                      onClick={(event) => menuRight.current?.toggle(event)}
-                      aria-controls="popup_menu_right"
-                      aria-haspopup
+                    <AvatarCustom
+                    size="normal"
+                    firstName={user?.firstName || 'U'}
+                    lastName={user?.lastName || 'U'}
+                    onClick={(event) => menuRight.current?.toggle(event)}
                     />
                   </div>
                 ) : (

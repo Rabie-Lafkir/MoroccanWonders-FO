@@ -1,17 +1,17 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { useDispatch } from 'react-redux';
+import { User } from '../types/User';
 
 
 interface AuthState {
-  userId: string | null;
+  user: User | null;
   accessToken: string | null;
   refreshToken: string | null;
 }
 
 const API_URL = import.meta.env.VITE_API_URL;
 const initialState: AuthState = {
-  userId: null,
+  user: null,
   accessToken: null,
   refreshToken: null,
 };
@@ -21,11 +21,12 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setAuthData: (state, action: PayloadAction<AuthState>) => {
-      state.userId = action.payload.userId;
+      state.user = action.payload.user;
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
       localStorage.setItem('accessToken', action.payload.accessToken!);
       localStorage.setItem('refreshToken', action.payload.refreshToken!);
+      localStorage.setItem('user',JSON.stringify(action.payload.user)! )
     },
     clearAuthData: (state) => {
       const accessToken = state.accessToken;
@@ -39,11 +40,12 @@ const authSlice = createSlice({
         });
       }
 
-      state.userId = null;
+      state.user = null;
       state.accessToken = null;
       state.refreshToken = null;
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
     },
   },
 });
