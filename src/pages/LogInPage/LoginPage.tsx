@@ -98,6 +98,7 @@ export default function LoginPage() {
       dispatch(
         setAuthData({
           user: {
+            userId: data.userId,
             firstName: data.firstName,
             lastName: data.lastName,
             gender: data.gender,

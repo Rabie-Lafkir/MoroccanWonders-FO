@@ -1,4 +1,5 @@
 export type User = {
+  userId: string 
   firstName: string | undefined | null;
   lastName: string;
   gender: string;

@@ -1,21 +1,23 @@
+// App.tsx
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { RouterProvider, createBrowserRouter, Navigate } from 'react-router-dom';
 import './App.css';
-import HomePage from './pages/HomePage/HomePage.tsx';
-import Layout from './components/Layout/Layout.tsx';
-import ContactPage from './pages/ContactPage/ContactPage.tsx';
-import LoginPage from './pages/LogInPage/LoginPage.tsx';
-import DestinationPage from './pages/DestinationPage/DestinationPage.tsx';
-import ItineraryPage from './pages/ItineraryPage/ItineraryPage.tsx';
-import NotFoundPage from './pages/NotFoundPage/NotFoundPage.tsx';
+import HomePage from './pages/HomePage/HomePage';
+import Layout from './components/Layout/Layout';
+import ContactPage from './pages/ContactPage/ContactPage';
+import LoginPage from './pages/LogInPage/LoginPage';
+import DestinationPage from './pages/DestinationPage/DestinationPage';
+import ItineraryPage from './pages/ItineraryPage/ItineraryPage';
+import NotFoundPage from './pages/NotFoundPage/NotFoundPage';
 import { setAuthData } from './store/authSlice';
-import OtpConfirmationPage from './pages/OtpConfirmationPage/OtpConfirmationPage.tsx';
-import ForgetPasswordPage from './pages/ForgetPasswordPage/ForgetPasswordPage.tsx';
-import ConfirmResetPasswordPage from './pages/ConfirmResetPasswordPage/ConfirmResetPasswordPage.tsx';
-import CategoryPage from './pages/CategoryPage/CategoryPage.tsx';
-import SignUpPage from './pages/SignUpPage/SignUpPage.tsx';
-import ProfilePage from './pages/ProfilePages/ProfilePage/ProfilePage.tsx';
+import OtpConfirmationPage from './pages/OtpConfirmationPage/OtpConfirmationPage';
+import ForgetPasswordPage from './pages/ForgetPasswordPage/ForgetPasswordPage';
+import ConfirmResetPasswordPage from './pages/ConfirmResetPasswordPage/ConfirmResetPasswordPage';
+import CategoryPage from './pages/CategoryPage/CategoryPage';
+import SignUpPage from './pages/SignUpPage/SignUpPage';
+import ProfilePage from './pages/ProfilePages/ProfilePage/ProfilePage';
+import ProfileDetailsPage from './pages/ProfilePages/ProfileDetailsPage/ProfileDetailsPage';
 
 function App() {
   const dispatch = useDispatch();
@@ -23,7 +25,7 @@ function App() {
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
     const refreshToken = localStorage.getItem('refreshToken');
-    const user = JSON.parse(localStorage.getItem('user')!)
+    const user = JSON.parse(localStorage.getItem('user')!);
     if (accessToken && refreshToken && user) {
       dispatch(setAuthData({ user, accessToken, refreshToken }));
     }
@@ -31,12 +33,12 @@ function App() {
 
   const router = createBrowserRouter([
     {
-      path: '*',   
+      path: '*',
       element: <NotFoundPage />,
     },
     {
       path: '/',
-      element: <Layout></Layout>,
+      element: <Layout />,
       children: [
         { path: '/', element: <HomePage /> },
         { path: '/destination', element: <DestinationPage /> },
@@ -48,15 +50,21 @@ function App() {
         { path: '/confirmation', element: <OtpConfirmationPage /> },
         { path: '/forget-password', element: <ForgetPasswordPage /> },
         { path: '/confirm-reset-password', element: <ConfirmResetPasswordPage /> },
-        {path: '/profile', element: <ProfilePage/>}
-
+        {
+          path: '/profile',
+          element: <ProfilePage />,
+          children: [
+            { index: true, element: <Navigate to="details" replace /> }, // Redirect from /profile to /profile/details
+            { path: 'details', element: <ProfileDetailsPage /> },
+            { path: 'settings', element: <div>Settings Page</div> }, // Placeholder content
+            { path: 'history', element: <div>History Page</div> }, // Placeholder content
+          ],
+        },
       ],
     },
   ]);
 
-  return (
-    <RouterProvider router={router} />
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;

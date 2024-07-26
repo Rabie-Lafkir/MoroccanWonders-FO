@@ -42,7 +42,7 @@ export default function Layout() {
           label: "Profile",
           icon: "pi pi-user",
           command: () => {
-            navigate("/");
+            navigate("/profile");
           },
         },
         {
@@ -105,7 +105,7 @@ export default function Layout() {
 
   return (
     <ToastProvider>
-    <div className="layout">
+    <div className="layout page-wrapper">
       <div className="site-header__header-one-wrap">
         <div className="topbar-one">
           <div className="container-fluid">

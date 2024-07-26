@@ -10,12 +10,22 @@
   }
   
   .sidebar-menu li {
-    margin: 10px 0;
+    padding: 10px 10px;
+    color: white;
     
+  }
+
+  .sidebar-menu li:hover{
+    background-color: #40b9eb;
+    color: #fff;
   }
   
   .sidebar-menu a {
     text-decoration: none;
-    color: #333;
+    color: #7c859b;
   }
   
+
+  .sidebar-menu a:hover {
+    color: #fff;
+  }
