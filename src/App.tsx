@@ -1,7 +1,6 @@
-// App.tsx
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { RouterProvider, createBrowserRouter, Navigate } from 'react-router-dom';
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import './App.css';
 import HomePage from './pages/HomePage/HomePage';
 import Layout from './components/Layout/Layout';
@@ -16,8 +15,8 @@ import ForgetPasswordPage from './pages/ForgetPasswordPage/ForgetPasswordPage';
 import ConfirmResetPasswordPage from './pages/ConfirmResetPasswordPage/ConfirmResetPasswordPage';
 import CategoryPage from './pages/CategoryPage/CategoryPage';
 import SignUpPage from './pages/SignUpPage/SignUpPage';
-import ProfilePage from './pages/ProfilePages/ProfilePage/ProfilePage';
-import ProfileDetailsPage from './pages/ProfilePages/ProfileDetailsPage/ProfileDetailsPage';
+import ProfilePage from './pages/ProfilePage/ProfilePage';
+
 
 function App() {
   const dispatch = useDispatch();
@@ -50,16 +49,7 @@ function App() {
         { path: '/confirmation', element: <OtpConfirmationPage /> },
         { path: '/forget-password', element: <ForgetPasswordPage /> },
         { path: '/confirm-reset-password', element: <ConfirmResetPasswordPage /> },
-        {
-          path: '/profile',
-          element: <ProfilePage />,
-          children: [
-            { index: true, element: <Navigate to="details" replace /> }, // Redirect from /profile to /profile/details
-            { path: 'details', element: <ProfileDetailsPage /> },
-            { path: 'settings', element: <div>Settings Page</div> }, // Placeholder content
-            { path: 'history', element: <div>History Page</div> }, // Placeholder content
-          ],
-        },
+        { path: '/profile', element: <ProfilePage /> },
       ],
     },
   ]);
