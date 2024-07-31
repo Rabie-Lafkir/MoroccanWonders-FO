@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { Navigate, RouterProvider, createBrowserRouter } from 'react-router-dom';
 import './App.css';
 import HomePage from './pages/HomePage/HomePage';
 import Layout from './components/Layout/Layout';
@@ -16,6 +16,7 @@ import ConfirmResetPasswordPage from './pages/ConfirmResetPasswordPage/ConfirmRe
 import CategoryPage from './pages/CategoryPage/CategoryPage';
 import SignUpPage from './pages/SignUpPage/SignUpPage';
 import ProfilePage from './pages/ProfilePage/ProfilePage';
+import ProfileDetailsPage from './pages/ProfilePage/ProfileDetailsPage/ProfileDetailsPage';
 
 
 function App() {
@@ -49,7 +50,15 @@ function App() {
         { path: '/confirmation', element: <OtpConfirmationPage /> },
         { path: '/forget-password', element: <ForgetPasswordPage /> },
         { path: '/confirm-reset-password', element: <ConfirmResetPasswordPage /> },
-        { path: '/profile', element: <ProfilePage /> },
+        {
+          path: '/profile',
+          element: <ProfilePage />,
+          children: [
+            { path: '', element: <Navigate to="details" replace /> },
+            { path: 'details' , element: <ProfileDetailsPage />, index: true },
+            { path: 'task' , element: <div /> }
+          ],
+        },
       ],
     },
   ]);

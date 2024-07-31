@@ -1,6 +1,8 @@
 import { Helmet } from "react-helmet";
 import { useTranslation } from "react-i18next";
 import PageHeader from "../../components/PageHeader/PageHeader";
+import { useEffect } from "react";
+import axios from "axios";
 
 export default function DestinationPage() {
   const { t } = useTranslation();
@@ -9,6 +11,26 @@ export default function DestinationPage() {
     { label: t("destination") },
   ];
   const title: string = `${t("destination")} - Moroccan Wonders`;
+  const API_URL = import.meta.env.VITE_API_URL;
+  const token = localStorage.getItem('accessToken')
+  useEffect(() => {
+    const fetchPlaces = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/place`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json', // Optional, depends on your API's requirements
+          },
+        });
+        console.log(response)
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    fetchPlaces()
+  });
+
   return (
     <>
       <Helmet>
