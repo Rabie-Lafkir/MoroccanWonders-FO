@@ -1,5 +1,3 @@
-// updateSlice.ts
-
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { User } from '../types/User';
 
@@ -19,6 +17,7 @@ const userSlice = createSlice({
   reducers: {
     setUser(state, action: PayloadAction<User>) {
       state.user = action.payload;
+      localStorage.setItem('user',JSON.stringify(action.payload)! )
     },
     updateUser(state, action: PayloadAction<Partial<User>>) {
       if (state.user) {

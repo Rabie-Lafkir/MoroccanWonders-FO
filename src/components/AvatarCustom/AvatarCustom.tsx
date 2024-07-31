@@ -2,14 +2,25 @@ import React from 'react';
 import { Avatar } from 'primereact/avatar';
 
 interface AvatarCustomProps {
+  className?: string;
   firstName: string;
   lastName: string;
   size?: 'normal' | 'large' | 'xlarge';
   onClick: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  image?: string;
+  children?: React.ReactNode; // Add children prop
 }
 
-const AvatarCustom: React.FC<AvatarCustomProps> = ({ firstName, lastName, size = 'normal', onClick }) => {
-  // Generate label from first letters of firstName and lastName
+const AvatarCustom: React.FC<AvatarCustomProps> = ({
+  className = '',
+  firstName,
+  lastName,
+  size = 'normal',
+  onClick,
+  image,
+  children,
+}) => {
+  // Generate label from the first letters of firstName and lastName
   const generateLabel = (firstName: string, lastName: string): string => {
     if (!firstName || !lastName) return '';
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
@@ -29,16 +40,17 @@ const AvatarCustom: React.FC<AvatarCustomProps> = ({ firstName, lastName, size =
   const backgroundColor = generateBackgroundColor(label);
 
   return (
-    <Avatar
-      label={label}
-      className="mr-2 ml-3"
-      style={{ backgroundColor, color: '#ffffff' }}
-      shape="circle"
-      size={size}
-      onClick={onClick}
-      aria-controls="popup_menu_right"
-      aria-haspopup
-    />
+    <div onClick={onClick} className={`avatar-custom ${className}`}>
+      <Avatar
+        label={image ? undefined : label}
+        className="mr-2 ml-3"
+        style={{ backgroundColor, color: '#ffffff' }}
+        shape="circle"
+        size={size}
+        image={image}
+      />
+      {children && <div className="avatar-children">{children}</div>}
+    </div>
   );
 };
 

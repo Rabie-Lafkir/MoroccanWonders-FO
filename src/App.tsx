@@ -9,7 +9,7 @@ import LoginPage from './pages/LogInPage/LoginPage';
 import DestinationPage from './pages/DestinationPage/DestinationPage';
 import ItineraryPage from './pages/ItineraryPage/ItineraryPage';
 import NotFoundPage from './pages/NotFoundPage/NotFoundPage';
-import { setAuthData } from './store/authSlice';
+import { setAuthData, updateUser } from './store/authSlice';
 import OtpConfirmationPage from './pages/OtpConfirmationPage/OtpConfirmationPage';
 import ForgetPasswordPage from './pages/ForgetPasswordPage/ForgetPasswordPage';
 import ConfirmResetPasswordPage from './pages/ConfirmResetPasswordPage/ConfirmResetPasswordPage';
@@ -28,6 +28,7 @@ function App() {
     const user = JSON.parse(localStorage.getItem('user')!);
     if (accessToken && refreshToken && user) {
       dispatch(setAuthData({ user, accessToken, refreshToken }));
+      dispatch(updateUser(user))
     }
   }, [dispatch]);
 

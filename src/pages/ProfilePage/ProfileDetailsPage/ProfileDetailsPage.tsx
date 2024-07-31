@@ -4,12 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faCamera, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { ToastContext } from "../../../helpers/context/ToastContext";
 import { startLoading, stopLoading } from "../../../store/loadingSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../../store/store"; 
-import { setUser, updateUser } from "../../../store/updateSlice";
+import { RootState } from "../../../store/store";
+import { updateUser } from "../../../store/authSlice";
+import AvatarCustom from "../../../components/AvatarCustom/AvatarCustom";
+import './ProfileDetailsPage.css';
 
 interface FormData {
   userId: string;
@@ -19,7 +21,7 @@ interface FormData {
   username: string;
   phoneNumber: string;
   originCountry: string;
-  image: string;
+  image: string; // This should be the fileKey returned from the upload
 }
 
 interface Errors {
@@ -54,6 +56,62 @@ export default function ProfileDetailsPage() {
   const [error, setError] = useState("");
   const [errors, setErrors] = useState<Errors>({});
   const [countries, setCountries] = useState<string[]>([]);
+  const [imageUrl, setImageUrl] = useState<string>(''); // State to store the image URL
+
+  const uploadImage = async (image: File, token: string) => {
+    const url = `${API_URL}/storage/save_file`;
+
+    // Create a form data object to send the image file
+    const formData = new FormData();
+    formData.append('file', image);
+
+    try {
+      // Send the POST request with the Bearer token in the headers
+      const response = await axios.post(url, formData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      return {
+        success: true,
+        message: response.data.message,
+        data: response.data.fileKey, // Extracting fileKey
+      };
+    } catch (error) {
+      // Handle errors, e.g., network issues, server errors
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to upload image',
+      };
+    }
+  };
+
+  const getImageData = async (fileKey: string | undefined): Promise<string> => {
+    if (!fileKey) {
+      return ''; // Return an empty string if there's no fileKey
+    }
+
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) throw new Error('Missing access token');
+
+      const response = await axios.get(`${API_URL}/storage/download/${fileKey}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        responseType: 'arraybuffer', // This is important for binary data
+      });
+
+      // Convert the binary data to a Blob
+      const blob = new Blob([response.data], { type: 'image/png' }); // Adjust the type if necessary
+      return URL.createObjectURL(blob);
+    } catch (error) {
+      console.error('Error fetching image data:', error);
+      return '';
+    }
+  };
 
   useEffect(() => {
     const fetchCountries = async () => {
@@ -69,7 +127,12 @@ export default function ProfileDetailsPage() {
     };
 
     fetchCountries();
-  }, []);
+
+    // Fetch the image URL if the fileKey (image) is available
+    if (formData.image) {
+      getImageData(formData.image).then(setImageUrl);
+    }
+  }, [formData.image]);
 
   const handleValidation = () => {
     const newErrors: Errors = {};
@@ -77,8 +140,7 @@ export default function ProfileDetailsPage() {
     if (!formData.lastName) newErrors.lastName = t("validation.required");
     if (!formData.username) newErrors.username = t("validation.required");
     if (!formData.phoneNumber) newErrors.phoneNumber = t("validation.required");
-    if (!formData.originCountry)
-      newErrors.originCountry = t("validation.required");
+    if (!formData.originCountry) newErrors.originCountry = t("validation.required");
     if (!formData.gender) newErrors.gender = t("validation.required");
     if (!formData.image) newErrors.image = t("validation.required");
 
@@ -86,9 +148,7 @@ export default function ProfileDetailsPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -100,17 +160,46 @@ export default function ProfileDetailsPage() {
     });
   };
 
+  const handleImageUploadClick = () => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*'; // Accept any image type
+    fileInput.onchange = async (event: Event) => {
+      const target = event.target as HTMLInputElement;
+      if (target.files && target.files[0]) {
+        const imageFile = target.files[0];
+        const token = localStorage.getItem("accessToken");
+        if (token) {
+          setLoading(true);
+          const response = await uploadImage(imageFile, token);
+          if (response.success) {
+            setFormData({ ...formData, image: response.data }); // Set the fileKey as image
+            toastContext?.showToast("success", t("success"), t("imageUploadSuccess"));
+          } else {
+            toastContext?.showToast("error", t("error"), response.message);
+          }
+          setLoading(false);
+        } else {
+          toastContext?.showToast("error", t("error"), t("missingToken"));
+        }
+      }
+    };
+    fileInput.click(); // Trigger the file input dialog
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!handleValidation()) return;
-    dispatch(startLoading());
+
     setLoading(true);
     setError("");
+    dispatch(startLoading());
 
     try {
       const token = localStorage.getItem("accessToken");
+
       await axios.put(
-        `${import.meta.env.VITE_API_URL}/account/user_info`,
+        `${API_URL}/account/user_info`,
         formData,
         {
           headers: {
@@ -119,32 +208,14 @@ export default function ProfileDetailsPage() {
         }
       );
 
-      await axios.get(`${API_URL}/account/user_info`, {
+      const response = await axios.get(`${API_URL}/account/user_info`, {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json', 
+          'Content-Type': 'application/json',
         },
-      }).then(response =>{
-        const data = response?.data
-        dispatch(
-          setUser({
-            
-              userId: data.userId,
-              firstName: data.firstName,
-              lastName: data.lastName,
-              gender: data.gender,
-              username: data.username,
-              emailVerified: data.emailVerified,
-              phoneNumber: data.phoneNumber,
-              phoneNumberVerified: data.phoneNumberVerified,
-              originCountry: data.originCountry,
-              image: data.image,
-              authorities: data.authorities,
-           
-          })
-        );
-
       });
+      const data = response.data;
+      dispatch(updateUser(data));
       toastContext?.showToast("success", t("success"), t("updateSuccess"));
       navigate("/profile");
     } catch (error) {
@@ -166,16 +237,24 @@ export default function ProfileDetailsPage() {
         <div className="container">
           <div className="row">
             <div className="col-lg-12">
-              <form
-                className="contact-one__form"
-                onSubmit={handleSubmit}
-                noValidate
-              >
+              <form className="contact-one__form" onSubmit={handleSubmit} noValidate>
+                <div className="d-flex align-items-center justify-content-center mb-5">
+                  <AvatarCustom 
+                    className= "avatar"
+                    firstName={formData.firstName}
+                    lastName={formData.lastName}
+                    size="xlarge"
+                    onClick={()=>{}} // Trigger the file input dialog
+                    image={imageUrl}
+                  >
+                    <button className="upload-icon" type="button" onClick={handleImageUploadClick}>
+                      <FontAwesomeIcon icon={faCamera} />
+                    </button>
+                  </AvatarCustom>
+                </div>
                 <div className="row low-gutters">
                   <div className="col-md-6">
-                    <div
-                      className={`input-group ${errors.firstName ? "error" : ""}`}
-                    >
+                    <div className={`input-group ${errors.firstName ? "error" : ""}`}>
                       <input
                         type="text"
                         name="firstName"
@@ -189,9 +268,7 @@ export default function ProfileDetailsPage() {
                     </div>
                   </div>
                   <div className="col-md-6">
-                    <div
-                      className={`input-group ${errors.lastName ? "error" : ""}`}
-                    >
+                    <div className={`input-group ${errors.lastName ? "error" : ""}`}>
                       <input
                         type="text"
                         name="lastName"
@@ -205,9 +282,7 @@ export default function ProfileDetailsPage() {
                     </div>
                   </div>
                   <div className="col-md-6">
-                    <div
-                      className={`input-group ${errors.username ? "error" : ""}`}
-                    >
+                    <div className={`input-group ${errors.username ? "error" : ""}`}>
                       <input
                         type="text"
                         name="username"
@@ -221,9 +296,7 @@ export default function ProfileDetailsPage() {
                     </div>
                   </div>
                   <div className="col-md-6">
-                    <div
-                      className={`input-group ${errors.phoneNumber ? "error" : ""}`}
-                    >
+                    <div className={`input-group ${errors.phoneNumber ? "error" : ""}`}>
                       <input
                         type="text"
                         name="phoneNumber"
@@ -232,16 +305,12 @@ export default function ProfileDetailsPage() {
                         onChange={handleChange}
                       />
                       {errors.phoneNumber && (
-                        <div className="error-message">
-                          {errors.phoneNumber}
-                        </div>
+                        <div className="error-message">{errors.phoneNumber}</div>
                       )}
                     </div>
                   </div>
                   <div className="col-md-6">
-                    <div
-                      className={`input-group ${errors.gender ? "error" : ""}`}
-                    >
+                    <div className={`input-group ${errors.gender ? "error" : ""}`}>
                       <select
                         className="w-100 country-select"
                         name="gender"
@@ -260,9 +329,7 @@ export default function ProfileDetailsPage() {
                     </div>
                   </div>
                   <div className="col-md-6">
-                    <div
-                      className={`input-group ${errors.originCountry ? "error" : ""}`}
-                    >
+                    <div className={`input-group ${errors.originCountry ? "error" : ""}`}>
                       <select
                         className="w-100 country-select"
                         name="originCountry"
@@ -279,23 +346,7 @@ export default function ProfileDetailsPage() {
                         ))}
                       </select>
                       {errors.originCountry && (
-                        <div className="error-message">
-                          {errors.originCountry}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div className="col-md-6">
-                    <div className={`input-group ${errors.image ? "error" : ""}`}>
-                      <input
-                        type="text"
-                        name="image"
-                        placeholder={t("image")}
-                        value={formData.image}
-                        onChange={handleChange}
-                      />
-                      {errors.image && (
-                        <div className="error-message">{errors.image}</div>
+                        <div className="error-message">{errors.originCountry}</div>
                       )}
                     </div>
                   </div>

@@ -1,0 +1,16 @@
+.p-avatar.p-avatar-xl {
+    width: 10rem !important;
+    height: 10rem !important;
+    font-size: 2rem;
+}
+
+.upload-icon{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 200;
+}
+
+.avatar{
+    position: relative;
+}

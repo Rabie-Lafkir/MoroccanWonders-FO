@@ -2,7 +2,6 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { User } from '../types/User';
 
-
 interface AuthState {
   user: User | null;
   accessToken: string | null;
@@ -26,7 +25,7 @@ const authSlice = createSlice({
       state.refreshToken = action.payload.refreshToken;
       localStorage.setItem('accessToken', action.payload.accessToken!);
       localStorage.setItem('refreshToken', action.payload.refreshToken!);
-      localStorage.setItem('user',JSON.stringify(action.payload.user)! )
+      localStorage.setItem('user', JSON.stringify(action.payload.user)!);
     },
     clearAuthData: (state) => {
       const accessToken = state.accessToken;
@@ -47,8 +46,14 @@ const authSlice = createSlice({
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
     },
+    updateUser: (state, action: PayloadAction<User>) => {
+      state.user = action.payload;
+      if (state.user) {
+        localStorage.setItem('user', JSON.stringify(state.user));
+      }
+    }
   },
 });
 
-export const { setAuthData, clearAuthData } = authSlice.actions;
+export const { setAuthData, clearAuthData, updateUser } = authSlice.actions;
 export default authSlice.reducer;
