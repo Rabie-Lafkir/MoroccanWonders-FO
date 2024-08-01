@@ -17,7 +17,7 @@ import CategoryPage from './pages/CategoryPage/CategoryPage';
 import SignUpPage from './pages/SignUpPage/SignUpPage';
 import ProfilePage from './pages/ProfilePage/ProfilePage';
 import ProfileDetailsPage from './pages/ProfilePage/ProfileDetailsPage/ProfileDetailsPage';
-
+import DestinationDetailsPage from './pages/DestinationDetailsPage/DestinationDetailsPage';
 
 function App() {
   const dispatch = useDispatch();
@@ -28,7 +28,7 @@ function App() {
     const user = JSON.parse(localStorage.getItem('user')!);
     if (accessToken && refreshToken && user) {
       dispatch(setAuthData({ user, accessToken, refreshToken }));
-      dispatch(updateUser(user))
+      dispatch(updateUser(user));
     }
   }, [dispatch]);
 
@@ -43,6 +43,7 @@ function App() {
       children: [
         { path: '/', element: <HomePage /> },
         { path: '/destination', element: <DestinationPage /> },
+        { path: '/destination/:id', element: <DestinationDetailsPage /> }, // Added this route
         { path: '/itinerary', element: <ItineraryPage /> },
         { path: '/category', element: <CategoryPage /> },
         { path: '/contact', element: <ContactPage /> },
@@ -56,8 +57,8 @@ function App() {
           element: <ProfilePage />,
           children: [
             { path: '', element: <Navigate to="details" replace /> },
-            { path: 'details' , element: <ProfileDetailsPage />, index: true },
-            { path: 'task' , element: <div /> }
+            { path: 'details', element: <ProfileDetailsPage />, index: true },
+            { path: 'task', element: <div /> },
           ],
         },
       ],
