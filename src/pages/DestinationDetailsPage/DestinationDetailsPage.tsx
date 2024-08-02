@@ -1,4 +1,123 @@
-export default function DestinationDetailsPage() {
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import { Galleria } from "primereact/galleria";
+import { useTranslation } from "react-i18next";
+import { timeSince } from "../../helpers/utils";
+
+interface Location {
+  latitude: string;
+  longitude: string;
+}
+
+interface NameDescription {
+  en: string;
+  fr: string;
+}
+
+interface Category {
+  id: string;
+  name: NameDescription;
+  subCategories: string[];
+  createdBy: string;
+  updatedBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface User {
+  id: string;
+  firstName: string;
+  lastName: string;
+  username: string;
+  image: string;
+}
+
+interface Rating {
+  id: string;
+  rate: number;
+  comment: string;
+  user: User;
+  createdAt: string;
+}
+
+interface Place {
+  id: string;
+  name: NameDescription;
+  description: NameDescription;
+  location: Location;
+  images: string[];
+  category: Category;
+  createdBy: string;
+  numberOfRatings: number;
+  generalRating: number;
+  ratings: Rating[];
+  region: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const DestinationDetailsPage: React.FC = () => {
+  const { t, i18n } = useTranslation();
+  const currentLanguage = i18n.language as keyof NameDescription;
+  const { id } = useParams<{ id: string }>();
+  const [place, setPlace] = useState<Place | null>(null);
+  const API_URL = import.meta.env.VITE_API_URL as string;
+  const token = localStorage.getItem("accessToken");
+
+  const responsiveOptions = [
+    {
+      breakpoint: "991px",
+      numVisible: 4,
+    },
+    {
+      breakpoint: "767px",
+      numVisible: 3,
+    },
+    {
+      breakpoint: "575px",
+      numVisible: 1,
+    },
+  ];
+
+  useEffect(() => {
+    const fetchPlaceDetails = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/place/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setPlace(response.data);
+      } catch (error) {
+        console.error("Error fetching place details:", error);
+      }
+    };
+
+    fetchPlaceDetails();
+  }, [id, API_URL, token]);
+
+  if (!place) {
+    return <div>Loading...</div>;
+  }
+
+  const { name, description, location, images, category, ratings } = place;
+
+  const galleriaImages = images.map((image) => ({
+    itemImageSrc: image,
+    thumbnailImageSrc: image,
+  }));
+
+  const itemTemplate = (item: any) => {
+    return (
+      <img src={item.itemImageSrc} alt="Image" style={{ width: "100%" }} />
+    );
+  };
+
+  const thumbnailTemplate = (item: any) => {
+    return <img src={item.thumbnailImageSrc} alt="Thumbnail" style={{ aspectRatio: "1/1", width: "50px" , height: "50px" }} />;
+  };
+
   return (
     <section className="tour-two tour-list">
       <div className="container">
@@ -7,328 +126,89 @@ export default function DestinationDetailsPage() {
             <div className="tour-details__content">
               <div className="tour-two__top">
                 <div className="tour-two__top-left">
-                  <h3>Magic of Italy Tours</h3>
+                  <h3>{name[currentLanguage]}</h3>
                   <div className="tour-one__stars">
                     <i className="fa fa-star"></i>
                     <i className="fa fa-star"></i>
                     <i className="fa fa-star"></i>
                     <i className="fa fa-star"></i>
-                    <i className="fa fa-star inactive"></i> 2 Reviews
+                    <i className="fa fa-star inactive"></i>{" "}
+                    { place.numberOfRatings} {t("reviews")}
                   </div>
-                </div>
-                <div className="tour-two__right">
-                  <p>
-                    <span>$1478</span> <br /> Per Person
-                  </p>
                 </div>
               </div>
               <ul className="tour-one__meta list-unstyled">
                 <li>
                   <a href="tour-details.html">
-                    <i className="far fa-clock"></i> 3 Days
+                    <i className="far fa-clock"></i> {timeSince(place?.createdAt, 'en')}
                   </a>
                 </li>
                 <li>
                   <a href="tour-details.html">
-                    <i className="far fa-user-circle"></i> 12+
+                    <i className="far fa-user-circle"></i> {place?.createdBy}
                   </a>
                 </li>
                 <li>
                   <a href="tour-details.html">
-                    <i className="far fa-bookmark"></i> Adventure
+                    <i className="far fa-bookmark"></i>{" "}
+                    {category.name[currentLanguage]}
                   </a>
                 </li>
                 <li>
                   <a href="tour-details.html">
-                    <i className="far fa-map"></i> Los Angeles
+                    <i className="far fa-map"></i> {place?.region}
                   </a>
                 </li>
               </ul>
 
-              <div className="tour-details__gallery-carousel">
-                <div className="swiper-wrapper">
-                  <div className="swiper-slide">
-                    <div className="tour-details__gallery-image">
-                      <img src="assets/images/tour/tour-d-1-1.jpg" alt="" />
-                      <div className="tour-details__gallery-links">
-                        <a href="#">
-                          <i className="fab fa-youtube"></i>
-                        </a>
-                        <a href="#">
-                          <i className="fa fa-heart"></i>
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                  {/* Additional slides */}
-                </div>
-              </div>
-
-              <div className="tour-details__gallery-thumb-carousel">
-                <div className="swiper-wrapper">
-                  <div className="swiper-slide">
-                    <div className="tour-details__gallery-thumb-image">
-                      <img src="assets/images/tour/tour-thumb-1-1.jpg" alt="" />
-                    </div>
-                  </div>
-                  {/* Additional thumb images */}
-                </div>
-              </div>
-
-              <h3 className="tour-details__title">Overview</h3>
-              <p>
-                Lorem ipsum available isn but the majority have suffered
-                alteratin in some or form injected. Lorem ipsum is simply free
-                text used by copytyping refreshing. Neque porro est qui dolorem
-                ipsum quia quaed inventore veritatis et quasi architecto beatae
-                vitae dicta sunt explicabo. Lorem ipsum is simply free text used
-                by copytyping refreshing. Neque porro est qui dolorem ipsum quia
-                quaed inventore veritatis et quasi architecto beatae vitae dicta
-                sunt explicabo. Aelltes port lacus quis enim var sed efficitur
-                turpis gilla sed sit amet finibus eros.
-              </p>
-              <h3 className="tour-details__subtitle">Included/Exclude</h3>
-              <div className="row">
-                <div className="col-md-6">
-                  <ul className="tour-details__list list-unstyled">
-                    <li>
-                      <i className="fa fa-check"></i>
-                      Pick and Drop Services
-                    </li>
-                    <li>
-                      <i className="fa fa-check"></i>1 Meal Per Day
-                    </li>
-                    <li>
-                      <i className="fa fa-check"></i>
-                      Cruise Dinner & Music Event
-                    </li>
-                    <li>
-                      <i className="fa fa-check"></i>
-                      Visit 7 Best Places in the City With Group
-                    </li>
-                  </ul>
-                </div>
-                <div className="col-md-6">
-                  <ul className="tour-details__list unavailable list-unstyled">
-                    <li>
-                      <i className="fa fa-times"></i>
-                      Additional Services
-                    </li>
-                    <li>
-                      <i className="fa fa-times"></i>1 Meal Per Day
-                    </li>
-                    <li>
-                      <i className="fa fa-times"></i>
-                      Insurance
-                    </li>
-                    <li>
-                      <i className="fa fa-times"></i>
-                      Food & Drinks
-                    </li>
-                  </ul>
-                </div>
-              </div>
+              {/* Galleria */}
+              <Galleria
+                circular
+                autoPlay
+                transitionInterval={2000}
+                value={galleriaImages}
+                responsiveOptions={responsiveOptions}
+                numVisible={5}
+                style={{ maxWidth: "640px" }}
+                item={itemTemplate}
+                thumbnail={thumbnailTemplate}
+              />
+<div className="tour-details__spacer"></div>
+              <h3 className="tour-details__title">{t("description")}</h3>
+              <p>{description[currentLanguage]}</p>
 
               <div className="tour-details__spacer"></div>
-              <h3 className="tour-details__title">Tour Plan</h3>
-
-              <div className="tour-details__plan">
-                <div className="tour-details__plan-single">
-                  <div className="tour-details__plan-count">01</div>
-                  <div className="tour-details__plan-content">
-                    <h3>Day 1: Arrive South Africa Forest</h3>
-                    <span>8:00 am to 10:00 am</span>
-                    <p>
-                      Lorem ipsum available isn but the majority have suffered
-                      alteratin in some or form injected. Lorem ipsum is simply
-                      free text used by copytyping refreshing. Neque porro est
-                      qui dolorem ipsum quia quaed inventore veritatis et quasi
-                      dicta sunt explicabo.
-                    </p>
-                    <ul className="list-unstyled">
-                      <li>Free Drinks</li>
-                      <li>Awesome Breakfast</li>
-                      <li>5 Star Accommodation</li>
-                    </ul>
-                  </div>
-                </div>
-                {/* Additional days */}
-              </div>
-
-              <div className="tour-details__spacer"></div>
-              <h3 className="tour-details__title">Tour Location</h3>
+              <h3 className="tour-details__title">{t("location")}</h3>
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4562.753041141002!2d-118.80123790098536!3d34.152323469614075!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80e82469c2162619%3A0xba03efb7998eef6d!2sCostco+Wholesale!5e0!3m2!1sbn!2sbd!4v1562518641290!5m2!1sbn!2sbd"
+                src={`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4562.753041141002!2d${location.longitude}!3d${location.latitude}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80e82469c2162619%3A0xba03efb7998eef6d!2sCostco+Wholesale!5e0!3m2!1sbn!2sbd!4v1562518641290!5m2!1sbn!2sbd`}
                 className="google-map__contact google-map__tour-details"
                 allowFullScreen
               ></iframe>
               <div className="tour-details__spacer"></div>
-              <h3 className="tour-details__title">Reviews Scores</h3>
-              <div className="tour-details__review-score">
-                <div className="tour-details__review-score-ave">
-                  <div className="my-auto">
-                    <h3>7.0</h3>
-                    <p>
-                      <i className="fa fa-star"></i> Super
-                    </p>
-                  </div>
-                </div>
-                <div className="tour-details__review-score__content">
-                  <div className="tour-details__review-score__bar">
-                    <div className="tour-details__review-score__bar-top">
-                      <h3>Services</h3>
-                      <p>50%</p>
-                    </div>
-                    <div className="tour-details__review-score__bar-line">
-                      <span
-                        className="wow slideInLeft"
-                        data-wow-duration="1500ms"
-                        style={{ width: "50%" }}
-                      ></span>
-                    </div>
-                  </div>
-                  {/* Additional review bars */}
-                </div>
-              </div>
 
               <div className="tour-details__review-comment">
-                <div className="tour-details__review-comment-single">
-                  <div className="tour-details__review-comment-top">
-                    <img src="assets/images/tour/tour-review-1-1.jpg" alt="" />
-                    <h3>Mike Hardson</h3>
-                    <p>06 Dec, 2019</p>
-                  </div>
-                  <div className="tour-details__review-comment-content">
-                    <h3>Fun Was To Discover This</h3>
-                    <p>
-                      Lorem ipsum is simply free text used by copytyping
-                      refreshing. Neque porro est qui dolorem ipsum quia quaed
-                      inventore veritatis et quasi architecto beatae vitae dicta
-                      sunt explicabo var lla sed sit amet finibus eros.
-                    </p>
-                  </div>
-                  <div className="tour-details__review-form-stars">
-                    <div className="row">
-                      <div className="col-md-4">
-                        <p>
-                          <span>Services</span>{" "}
-                          <i className="fa fa-star active"></i>
-                          <i className="fa fa-star active"></i>
-                          <i className="fa fa-star"></i>
-                          <i className="fa fa-star"></i>
-                          <i className="fa fa-star"></i>
-                        </p>
-                        <p>
-                          <span>Comfort</span>{" "}
-                          <i className="fa fa-star active"></i>
-                          <i className="fa fa-star active"></i>
-                          <i className="fa fa-star"></i>
-                          <i className="fa fa-star"></i>
-                          <i className="fa fa-star"></i>
-                        </p>
-                      </div>
-                      <div className="col-md-4">
-                        <p>
-                          <span>Services</span>{" "}
-                          <i className="fa fa-star active"></i>
-                          <i className="fa fa-star active"></i>
-                          <i className="fa fa-star"></i>
-                          <i className="fa fa-star"></i>
-                          <i className="fa fa-star"></i>
-                        </p>
-                        <p>
-                          <span>Comfort</span>{" "}
-                          <i className="fa fa-star active"></i>
-                          <i className="fa fa-star active"></i>
-                          <i className="fa fa-star"></i>
-                          <i className="fa fa-star"></i>
-                          <i className="fa fa-star"></i>
-                        </p>
-                      </div>
-                      <div className="col-md-4">
-                        <p>
-                          <span>Services</span>{" "}
-                          <i className="fa fa-star active"></i>
-                          <i className="fa fa-star active"></i>
-                          <i className="fa fa-star"></i>
-                          <i className="fa fa-star"></i>
-                          <i className="fa fa-star"></i>
-                        </p>
-                        <p>
-                          <span>Comfort</span>{" "}
-                          <i className="fa fa-star active"></i>
-                          <i className="fa fa-star active"></i>
-                          <i className="fa fa-star"></i>
-                          <i className="fa fa-star"></i>
-                          <i className="fa fa-star"></i>
-                        </p>
-                      </div>
+                {ratings.map((rating) => (
+                  <div
+                    key={rating.id}
+                    className="tour-details__review-comment-single"
+                  >
+                    <div className="tour-details__review-comment-top">
+                      <img
+                        src={rating.user.image}
+                        alt={`${rating.user.firstName} ${rating.user.lastName}`}
+                      />
+                      <h3>{`${rating.user.firstName} ${rating.user.lastName}`}</h3>
+                      <p>{new Date(rating.createdAt).toLocaleDateString()}</p>
+                    </div>
+                    <div className="tour-details__review-comment-content">
+                      <p>{rating.comment}</p>
                     </div>
                   </div>
-                </div>
-                {/* Additional review comments */}
+                ))}
               </div>
 
-              <h3 className="tour-details__title">Write a Review</h3>
+              <h3 className="tour-details__title">{t("write_a_review")}</h3>
               <div className="tour-details__review-form">
-                <div className="tour-details__review-form-stars">
-                  <div className="row">
-                    <div className="col-md-4">
-                      <p>
-                        <span>Services</span>{" "}
-                        <i className="fa fa-star active"></i>
-                        <i className="fa fa-star active"></i>
-                        <i className="fa fa-star"></i>
-                        <i className="fa fa-star"></i>
-                        <i className="fa fa-star"></i>
-                      </p>
-                      <p>
-                        <span>Comfort</span>{" "}
-                        <i className="fa fa-star active"></i>
-                        <i className="fa fa-star active"></i>
-                        <i className="fa fa-star"></i>
-                        <i className="fa fa-star"></i>
-                        <i className="fa fa-star"></i>
-                      </p>
-                    </div>
-                    <div className="col-md-4">
-                      <p>
-                        <span>Services</span>{" "}
-                        <i className="fa fa-star active"></i>
-                        <i className="fa fa-star active"></i>
-                        <i className="fa fa-star"></i>
-                        <i className="fa fa-star"></i>
-                        <i className="fa fa-star"></i>
-                      </p>
-                      <p>
-                        <span>Comfort</span>{" "}
-                        <i className="fa fa-star active"></i>
-                        <i className="fa fa-star active"></i>
-                        <i className="fa fa-star"></i>
-                        <i className="fa fa-star"></i>
-                        <i className="fa fa-star"></i>
-                      </p>
-                    </div>
-                    <div className="col-md-4">
-                      <p>
-                        <span>Services</span>{" "}
-                        <i className="fa fa-star active"></i>
-                        <i className="fa fa-star active"></i>
-                        <i className="fa fa-star"></i>
-                        <i className="fa fa-star"></i>
-                        <i className="fa fa-star"></i>
-                      </p>
-                      <p>
-                        <span>Comfort</span>{" "}
-                        <i className="fa fa-star active"></i>
-                        <i className="fa fa-star active"></i>
-                        <i className="fa fa-star"></i>
-                        <i className="fa fa-star"></i>
-                        <i className="fa fa-star"></i>
-                      </p>
-                    </div>
-                  </div>
-                </div>
                 <form
                   action="https://pixydrops.com/tripo/inc/sendemail.php"
                   className="contact-one__form"
@@ -339,7 +219,7 @@ export default function DestinationDetailsPage() {
                         <input
                           type="text"
                           name="name"
-                          placeholder="Your Name"
+                          placeholder={t("your_name")}
                         />
                       </div>
                     </div>
@@ -348,7 +228,7 @@ export default function DestinationDetailsPage() {
                         <input
                           type="text"
                           name="email"
-                          placeholder="Email Address"
+                          placeholder={t("email_address")}
                         />
                       </div>
                     </div>
@@ -357,7 +237,7 @@ export default function DestinationDetailsPage() {
                         <input
                           type="text"
                           name="subject"
-                          placeholder="Review Title"
+                          placeholder={t("review_title")}
                         />
                       </div>
                     </div>
@@ -365,7 +245,7 @@ export default function DestinationDetailsPage() {
                       <div className="input-group">
                         <textarea
                           name="message"
-                          placeholder="Write Message"
+                          placeholder={t("write_message")}
                         ></textarea>
                       </div>
                     </div>
@@ -375,7 +255,7 @@ export default function DestinationDetailsPage() {
                           type="submit"
                           className="thm-btn contact-one__btn"
                         >
-                          Submit a review
+                          {t("submit_review")}
                         </button>
                       </div>
                     </div>
@@ -386,51 +266,18 @@ export default function DestinationDetailsPage() {
           </div>
           <div className="col-lg-4">
             <div className="tour-sidebar">
-              <div className="tour-sidebar__search tour-sidebar__single">
-                <h3>Book This Tour</h3>
-                <form action="#" className="tour-sidebar__search-form">
-                  <div className="input-group">
-                    <input type="text" placeholder="Your Name" />
-                  </div>
-                  <div className="input-group">
-                    <input type="text" placeholder="Email Address" />
-                  </div>
-                  <div className="input-group">
-                    <input type="text" placeholder="Phone" />
-                  </div>
-                  <div className="input-group">
-                    <input
-                      type="text"
-                      data-provide="datepicker"
-                      placeholder="dd/mm/yy"
-                    />
-                  </div>
-                  <div className="input-group">
-                    <select className="selectpicker">
-                      <option value="Tickets">Tickets</option>
-                      <option value="Children">Children</option>
-                      <option value="Adult">Adult</option>
-                    </select>
-                  </div>
-                  <div className="input-group">
-                    <textarea placeholder="Message"></textarea>
-                  </div>
-                  <div className="input-group">
-                    <button type="submit" className="thm-btn">
-                      Book Now
-                    </button>
-                  </div>
-                </form>
-              </div>
               <div className="tour-sidebar__organizer">
-                <h3>Organized by</h3>
+                <h3>{t("organized_by")}</h3>
                 <div className="tour-sidebar__organizer-content">
-                  <img src="assets/images/tour/tour-organizer-1-1.jpg" alt="" />
+                  <img
+                    src="src/assets/images/tour/tour-organizer-1-1.jpg"
+                    alt="Organizer"
+                  />
                   <p>
-                    <i className="fa fa-star"></i>8.0 Superb
+                    <i className="fa fa-star"></i>8.0 {t("superb")}
                   </p>
                   <h3>Mike Hardson</h3>
-                  <span>Member Since 2019</span>
+                  <span>{t("member_since", { year: 2019 })}</span>
                 </div>
               </div>
             </div>
@@ -439,4 +286,6 @@ export default function DestinationDetailsPage() {
       </div>
     </section>
   );
-}
+};
+
+export default DestinationDetailsPage;
