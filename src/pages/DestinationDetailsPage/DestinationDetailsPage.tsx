@@ -5,6 +5,8 @@ import { Galleria } from "primereact/galleria";
 import { useTranslation } from "react-i18next";
 import { timeSince } from "../../helpers/utils";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+import { Rating } from "primereact/rating";
+import './DestinationDetailsPage.css'
 
 interface Location {
   latitude: string;
@@ -161,12 +163,16 @@ const DestinationDetailsPage: React.FC = () => {
                 <div className="tour-two__top-left">
                   <h3>{name[currentLanguage]}</h3>
                   <div className="tour-one__stars">
-                    <i className="fa fa-star"></i>
-                    <i className="fa fa-star"></i>
-                    <i className="fa fa-star"></i>
-                    <i className="fa fa-star"></i>
-                    <i className="fa fa-star inactive"></i>{" "}
-                    {place.numberOfRatings} {t("reviews")}
+                    <Rating
+                      value={place.generalRating}
+                      readOnly
+                      cancel={false}
+                    />
+                    <p style={{ marginLeft: "10px" }}>
+                      {place.numberOfRatings}
+                      {" "}
+                      {t("reviews")}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -262,8 +268,8 @@ const DestinationDetailsPage: React.FC = () => {
               <h3 className="tour-details__title">Reviews Scores</h3>
               <div className="tour-details__review-score">
                 <div className="tour-details__review-score-ave">
-                  <div className="my-auto d-flex align-items-center justify-content-center">
-                    <h3>{place.generalRating}</h3>
+                  <div className="my-auto d-flex align-items-center justify-content-between" style={{padding: "20px"}}>
+                  <h3>{place.generalRating.toFixed(1)}</h3>
                     <p>
                       <i className="fa fa-star"></i> Super
                     </p>
@@ -272,7 +278,6 @@ const DestinationDetailsPage: React.FC = () => {
               </div>
               <h3 className="tour-details__title">{t("write_a_review")}</h3>
               <div className="tour-details__review-form">
-                
                 <form
                   action="https://pixydrops.com/tripo/inc/sendemail.php"
                   className="contact-one__form"
