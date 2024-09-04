@@ -4,13 +4,19 @@
     font-size: 2rem;
 }
 
-.upload-icon{
+.upload-icon {
     position: absolute;
-    bottom: 0;
+    bottom: 20px;
     right: 0;
     z-index: 200;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    border: none;
+    color: #fff;
+    background-color: #ffa801;
 }
 
-.avatar{
+.avatar {
     position: relative;
 }

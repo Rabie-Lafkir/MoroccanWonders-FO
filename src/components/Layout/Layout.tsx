@@ -9,29 +9,32 @@ import { useDispatch, useSelector } from "react-redux";
 import { clearAuthData } from "../../store/authSlice";
 import { RootState } from "../../store/store";
 import { ToastProvider } from "../../helpers/context/ToastContext";
-import { ProgressBar } from 'primereact/progressbar'; 
+import { ProgressBar } from "primereact/progressbar";
 import { startLoading, stopLoading } from "../../store/loadingSlice";
 import AvatarCustom from "../AvatarCustom/AvatarCustom";
-
+import axios from "axios";
 
 export default function Layout() {
   const { t, i18n } = useTranslation();
   const [currentLanguage, setCurrentLanguage] = useState<string>(i18n.language);
+  const [image, setImage] = useState("");
   const location = useLocation();
   const { scrollToTop } = useScrollToTop();
   const menuRight = useRef<Menu>(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state: RootState) => state.auth.accessToken);
-  const isLoading = useSelector((state: RootState) => state.loading.isLoading); 
-  const user = useSelector((state: RootState ) => state.auth.user)
-
+  const isLoading = useSelector((state: RootState) => state.loading.isLoading);
+  const user = useSelector((state: RootState) => state.auth.user);
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const handleLogout = () => {
     dispatch(clearAuthData());
-    dispatch(startLoading())
-    setTimeout(() => {dispatch(stopLoading())
-    navigate("/login")}, 500)
+    dispatch(startLoading());
+    setTimeout(() => {
+      dispatch(stopLoading());
+      navigate("/login");
+    }, 500);
   };
 
   const items: MenuItem[] = [
@@ -48,7 +51,7 @@ export default function Layout() {
         {
           label: "Logout",
           icon: "pi pi-sign-out",
-          command: handleLogout
+          command: handleLogout,
         },
       ],
     },
@@ -62,7 +65,7 @@ export default function Layout() {
     };
 
     if ($(".side-menu__toggler").length) {
-      $(".side-menu__toggler").off("click").on("click", handleMenuToggle);
+      $(".side-menu__toggler").on("click", handleMenuToggle);
     }
 
     return () => {
@@ -103,308 +106,318 @@ export default function Layout() {
     return new Date().getFullYear();
   }
 
+  const getImageData = async (fileKey: string | undefined): Promise<string> => {
+    if (!fileKey) {
+      return ""; // Return an empty string if there's no fileKey
+    }
+
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) throw new Error("Missing access token");
+
+      const response = await axios.get(
+        `${API_URL}/storage/download/${fileKey}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          responseType: "arraybuffer", // This is important for binary data
+        }
+      );
+
+      // Convert the binary data to a Blob
+      const blob = new Blob([response.data], { type: "image/png" }); // Adjust the type if necessary
+      return URL.createObjectURL(blob);
+    } catch (error) {
+      console.error("Error fetching image data:", error);
+      return "";
+    }
+  };
+
+  useEffect(() => {
+    const fetchImage = async () => {
+      const imageUrl = await getImageData(user?.image);
+      setImage(imageUrl);
+    };
+
+    if (user?.image) {
+      fetchImage();
+    }
+  }, [user?.image]);
+
   return (
     <ToastProvider>
-    <div className="layout page-wrapper">
-      <div className="site-header__header-one-wrap">
-        <div className="topbar-one">
-          <div className="container-fluid">
-            <div className="topbar-one__left">
-              <a href="mailto:needhelp@moroccanwonders.com">
-                needhelp@moroccanwonders.com
-              </a>
-            </div>
-            <div className="topbar-one__right">
-              <div className="topbar-one__social">
-                <Link to="#">
-                  <i className="fab fa-facebook-square"></i>
-                </Link>
-                <Link to="#">
-                  <i className="fab fa-twitter"></i>
-                </Link>
-                <Link to="#">
-                  <i className="fab fa-instagram"></i>
-                </Link>
+      <div className="layout page-wrapper">
+        <div className="site-header__header-one-wrap">
+          <div className="topbar-one">
+            <div className="container-fluid">
+              <div className="topbar-one__left">
+                <a href="mailto:needhelp@moroccanwonders.com">
+                  needhelp@moroccanwonders.com
+                </a>
               </div>
-              {!isLoggedIn ? (
-                <>
-                  <Link
-                    onClick={scrollToTop}
-                    to="/login"
-                    className="topbar-one__guide-btn"
-                  >
-                    {t("login")}
+              <div className="topbar-one__right">
+                <div className="topbar-one__social">
+                  <Link to="#">
+                    <i className="fab fa-facebook-square"></i>
                   </Link>
-                  <Link
-                    onClick={scrollToTop}
-                    to="/signup"
-                    className="topbar-one__guide-btn"
-                  >
-                    {t("signup")}
+                  <Link to="#">
+                    <i className="fab fa-twitter"></i>
                   </Link>
-                </>
-              ) : (
-                ""
-              )}
-            </div>
-          </div>
-        </div>
-        <header className="main-nav__header-one ">
-          <nav className="header-navigation stricky">
-            <div className="container">
-              <div className="main-nav__logo-box">
-                <Link onClick={scrollToTop} to="/" className="main-nav__logo">
-                  <img
-                    src="src/assets/images/logo.png"
-                    className="main-logo"
-                    width="123"
-                    alt="Awesome Image"
-                  />
-                </Link>
-                <Link to="#" className="side-menu__toggler">
-                  <i className="fa fa-bars"></i>
-                </Link>
-              </div>
-
-              <div className="main-nav__main-navigation">
-                <ul className="main-nav__navigation-box">
-                  <li
-                    className={`dropdown ${
-                      location.pathname === "/" ? "current" : ""
-                    }`}
-                  >
-                    <Link to="/">{t("home")}</Link>
-                  </li>
-                  <li
-                    className={`dropdown ${
-                      location.pathname === "/destination" ? "current" : ""
-                    }`}
-                  >
-                    <Link onClick={scrollToTop} to="/destination">
-                      {t("destination")}
+                  <Link to="#">
+                    <i className="fab fa-instagram"></i>
+                  </Link>
+                </div>
+                {!isLoggedIn ? (
+                  <>
+                    <Link
+                      onClick={scrollToTop}
+                      to="/login"
+                      className="topbar-one__guide-btn"
+                    >
+                      {t("login")}
                     </Link>
-                  </li>
-                  <li
-                    className={`dropdown ${
-                      location.pathname === "/itinerary" ? "current" : ""
-                    }`}
-                  >
-                    <Link to="/itinerary">{t("itinerary")}</Link>
-                  </li>
-                  <li
-                    className={`dropdown ${
-                      location.pathname === "/contact" ? "current" : ""
-                    }`}
-                  >
-                    <Link to="/contact">{t("contact")}</Link>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="main-nav__right">
-                <Link to="#" className="main-nav__search search-popup__toggler">
-                  <i className="tripo-icon-magnifying-glass"></i>
-                </Link>
-                <select
-                  name="languages"
-                  id="languages"
-                  className="selectpicker"
-                  onChange={handleChangeLanguage}
-                  value={currentLanguage}
-                >
-                  <option value="en">English</option>
-                  <option value="fr">Français</option>
-                </select>
-                {isLoggedIn ? (
-                  <div>
-                    <Menu
-                      className="mt-2"
-                      model={items}
-                      popup
-                      ref={menuRight}
-                      id="popup_menu_right"
-                      popupAlignment="right"
-                    />
-                    <AvatarCustom
-                    size="normal"
-                    firstName={user?.firstName || 'U'}
-                    lastName={user?.lastName || 'U'}
-                    onClick={(event) => menuRight.current?.toggle(event)}
-                    />
-                  </div>
+                    <Link
+                      onClick={scrollToTop}
+                      to="/signup"
+                      className="topbar-one__guide-btn"
+                    >
+                      {t("signup")}
+                    </Link>
+                  </>
                 ) : (
                   ""
                 )}
               </div>
             </div>
-          </nav>
-        </header>
-        {isLoading && <ProgressBar mode="indeterminate" style={{ height: '6px' }} />} {/* Add ProgressBar here */}
-      </div>
+          </div>
+          <header className="main-nav__header-one ">
+            <nav className="header-navigation stricky">
+              <div className="container">
+                <div className="main-nav__logo-box">
+                  <Link onClick={scrollToTop} to="/" className="main-nav__logo">
+                    <img
+                      src="src/assets/images/logo.png"
+                      className="main-logo"
+                      width="123"
+                      alt="Awesome Image"
+                    />
+                  </Link>
+                  <Link to="#" className="side-menu__toggler">
+                    <i className="fa fa-bars"></i>
+                  </Link>
+                </div>
 
-      <main>
-        <Outlet />
-      </main>
+                <div className="main-nav__main-navigation">
+                  <ul className="main-nav__navigation-box">
+                    <li
+                      className={`dropdown ${
+                        location.pathname === "/" ? "current" : ""
+                      }`}
+                    >
+                      <Link to="/">{t("home")}</Link>
+                    </li>
+                    <li
+                      className={`dropdown ${
+                        location.pathname === "/destination" ? "current" : ""
+                      }`}
+                    >
+                      <Link onClick={scrollToTop} to="/destination">
+                        {t("destination")}
+                      </Link>
+                    </li>
+                    <li
+                      className={`dropdown ${
+                        location.pathname === "/itinerary" ? "current" : ""
+                      }`}
+                    >
+                      <Link to="/itinerary">{t("itinerary")}</Link>
+                    </li>
+                    <li
+                      className={`dropdown ${
+                        location.pathname === "/contact" ? "current" : ""
+                      }`}
+                    >
+                      <Link to="/contact">{t("contact")}</Link>
+                    </li>
+                  </ul>
+                </div>
 
-      <footer className="site-footer">
-        <div className="site-footer__bg"></div>
+                <div className="main-nav__right">
+                  <Link
+                    to="#"
+                    className="main-nav__search search-popup__toggler"
+                  >
+                    <i className="tripo-icon-magnifying-glass"></i>
+                  </Link>
+                  <select
+                    name="languages"
+                    id="languages"
+                    className="selectpicker"
+                    onChange={handleChangeLanguage}
+                    value={currentLanguage}
+                  >
+                    <option value="en">English</option>
+                    <option value="fr">Français</option>
+                  </select>
+                  {isLoggedIn ? (
+                    <div>
+                      <Menu
+                        className="mt-2"
+                        model={items}
+                        popup
+                        ref={menuRight}
+                        id="popup_menu_right"
+                        popupAlignment="right"
+                      />
+                      <AvatarCustom
+                        size="normal"
+                        firstName={user?.firstName || "U"}
+                        lastName={user?.lastName || "U"}
+                        image={image!}
+                        onClick={(event) => menuRight.current?.toggle(event)}
+                      />
+                    </div>
+                  ) : (
+                    ""
+                  )}
+                </div>
+              </div>
+            </nav>
+          </header>
+          {isLoading && (
+            <ProgressBar mode="indeterminate" style={{ height: "6px" }} />
+          )}{" "}
+          {/* Add ProgressBar here */}
+        </div>
 
-        <div className="container">
-          <div className="row">
-            <div className="footer-widget__column footer-widget__about">
-              <Link
-                onClick={scrollToTop}
-                to="/"
-                className="footer-widget__logo"
-              >
-                <img src="src/assets/images/logo.png" width="230" alt="" />
-              </Link>
-              <p>{t("descriptionFooter")}</p>
-              <a href="mailto:needhelp@moroccanwonders.com">
-                needhelp@moroccanwonders.com
-              </a>
-              <br />
-            </div>
-            <div className="footer-widget__column footer-widget__links">
-              <h3 className="footer-widget__title">Company</h3>
-              <ul className="footer-widget__links-list list-unstyled">
-                <li>
-                  <Link onClick={scrollToTop} to="/about">
-                    {t("about")}
-                  </Link>
-                </li>
-                <li>
-                  <Link onClick={scrollToTop} to="/team">
-                    {t("team")}
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div className="footer-widget__column footer-widget__links">
-              <h3 className="footer-widget__title">Links</h3>
-              <ul className="footer-widget__links-list list-unstyled">
-                <li>
-                  <Link onClick={scrollToTop} to="/destination">
-                    {t("destination")}
-                  </Link>
-                </li>
-                <li>
-                  <Link onClick={scrollToTop} to="/itinerary">
-                    {t("itinerary")}
-                  </Link>
-                </li>
-                <li>
-                  <Link onClick={scrollToTop} to="/contact">
-                    {t("contact")}
-                  </Link>
-                </li>
-                <li>
-                  <Link onClick={scrollToTop} to="/faq">
-                    FAQs
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div className="footer-widget__column footer-widget__gallery">
-              <h3 className="footer-widget__title">Instagram</h3>
-              <ul className="footer-widget__gallery-list list-unstyled">
-                <li>
-                  <a href="#">
-                    <img
-                      src="src/assets/images/resources/footer-1-1.jpg"
-                      alt=""
-                    />
-                  </a>
-                </li>
-                <li>
-                  <a href="#">
-                    <img
-                      src="src/assets/images/resources/footer-1-2.jpg"
-                      alt=""
-                    />
-                  </a>
-                </li>
-                <li>
-                  <a href="#">
-                    <img
-                      src="src/assets/images/resources/footer-1-3.jpg"
-                      alt=""
-                    />
-                  </a>
-                </li>
-                <li>
-                  <a href="#">
-                    <img
-                      src="src/assets/images/resources/footer-1-4.jpg"
-                      alt=""
-                    />
-                  </a>
-                </li>
-                <li>
-                  <a href="#">
-                    <img
-                      src="src/assets/images/resources/footer-1-5.jpg"
-                      alt=""
-                    />
-                  </a>
-                </li>
-                <li>
-                  <a href="#">
-                    <img
-                      src="src/assets/images/resources/footer-1-6.jpg"
-                      alt=""
-                    />
-                  </a>
-                </li>
-              </ul>
+        <main>
+          <Outlet />
+        </main>
+
+        <footer className="site-footer">
+          <div className="site-footer__bg"></div>
+
+          <div className="container">
+            <div className="row">
+              <div className="footer-widget__column footer-widget__about">
+                <Link
+                  onClick={scrollToTop}
+                  to="/"
+                  className="footer-widget__logo"
+                >
+                  <img src="src/assets/images/logo.png" width="230" alt="" />
+                </Link>
+                <p>{t("descriptionFooter")}</p>
+                <a href="mailto:needhelp@moroccanwonders.com">
+                  needhelp@moroccanwonders.com
+                </a>
+                <br />
+              </div>
+              <div className="footer-widget__column footer-widget__links">
+                <h3 className="footer-widget__title">Company</h3>
+                <ul className="footer-widget__links-list list-unstyled">
+                  <li>
+                    <Link onClick={scrollToTop} to="/about">
+                      {t("about")}
+                    </Link>
+                  </li>
+                  <li>
+                    <Link onClick={scrollToTop} to="/team">
+                      {t("team")}
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+              <div className="footer-widget__column footer-widget__links">
+                <h3 className="footer-widget__title">Links</h3>
+                <ul className="footer-widget__links-list list-unstyled">
+                  <li>
+                    <Link onClick={scrollToTop} to="/destination">
+                      {t("destination")}
+                    </Link>
+                  </li>
+                  <li>
+                    <Link onClick={scrollToTop} to="/itinerary">
+                      {t("itinerary")}
+                    </Link>
+                  </li>
+                  <li>
+                    <Link onClick={scrollToTop} to="/contact">
+                      {t("contact")}
+                    </Link>
+                  </li>
+                  <li>
+                    <Link onClick={scrollToTop} to="/faq">
+                      FAQs
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+              <div className="footer-widget__column footer-widget__gallery">
+                <h3 className="footer-widget__title">Instagram</h3>
+                <ul className="footer-widget__gallery-list list-unstyled">
+                  <li>
+                    <a href="#">
+                      <img
+                        src="src/assets/images/resources/footer-1-1.jpg"
+                        alt=""
+                      />
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#">
+                      <img
+                        src="src/assets/images/resources/footer-1-2.jpg"
+                        alt=""
+                      />
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#">
+                      <img
+                        src="src/assets/images/resources/footer-1-3.jpg"
+                        alt=""
+                      />
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#">
+                      <img
+                        src="src/assets/images/resources/footer-1-4.jpg"
+                        alt=""
+                      />
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#">
+                      <img
+                        src="src/assets/images/resources/footer-1-5.jpg"
+                        alt=""
+                      />
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#">
+                      <img
+                        src="src/assets/images/resources/footer-1-6.jpg"
+                        alt=""
+                      />
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
-        </div>
-      </footer>
+        </footer>
 
-      <div className="site-footer__bottom">
-        <div className="container">
-          <p>
-            @ All copyright {getCurrentYear()},{" "}
-            <a href="#">MoroccanWonders Team</a>
-          </p>
-          <div className="site-footer__social">
-            <a href="#">
-              <i className="fab fa-facebook-square"></i>
-            </a>
-            <a href="#">
-              <i className="fab fa-twitter"></i>
-            </a>
-            <a href="#">
-              <i className="fab fa-instagram"></i>
-            </a>
-            <a href="#">
-              <i className="fab fa-dribbble"></i>
-            </a>
-          </div>
-        </div>
-      </div>
-      <a href="#" data-target="html" className="scroll-to-target scroll-to-top">
-        <i className="fa fa-angle-up"></i>
-      </a>
-      <div className="side-menu__block">
-        <div className="side-menu__block-overlay custom-cursor__overlay">
-          <div className="cursor"></div>
-          <div className="cursor-follower"></div>
-        </div>
-        <div className="side-menu__block-inner ">
-          <div className="side-menu__top justify-content-end">
-            <a href="#" className="side-menu__toggler side-menu__close-btn">
-              <img src="src/assets/images/shapes/close-1-1.png" alt="" />
-            </a>
-          </div>
-
-          <nav className="mobile-nav__container">
-            {/* <!-- content is loading via js --> */}
-          </nav>
-          <div className="side-menu__sep"></div>
-          <div className="side-menu__content">
-            <div className="side-menu__social">
+        <div className="site-footer__bottom">
+          <div className="container">
+            <p>
+              @ All copyright {getCurrentYear()},{" "}
+              <a href="#">MoroccanWonders Team</a>
+            </p>
+            <div className="site-footer__social">
               <a href="#">
                 <i className="fab fa-facebook-square"></i>
               </a>
@@ -415,13 +428,53 @@ export default function Layout() {
                 <i className="fab fa-instagram"></i>
               </a>
               <a href="#">
-                <i className="fab fa-pinterest-p"></i>
+                <i className="fab fa-dribbble"></i>
               </a>
             </div>
           </div>
         </div>
+        <a
+          href="#"
+          data-target="html"
+          className="scroll-to-target scroll-to-top"
+        >
+          <i className="fa fa-angle-up"></i>
+        </a>
+        <div className="side-menu__block">
+          <div className="side-menu__block-overlay custom-cursor__overlay">
+            <div className="cursor"></div>
+            <div className="cursor-follower"></div>
+          </div>
+          <div className="side-menu__block-inner ">
+            <div className="side-menu__top justify-content-end">
+              <a href="#" className="side-menu__toggler side-menu__close-btn">
+                <img src="src/assets/images/shapes/close-1-1.png" alt="" />
+              </a>
+            </div>
+
+            <nav className="mobile-nav__container">
+              {/* <!-- content is loading via js --> */}
+            </nav>
+            <div className="side-menu__sep"></div>
+            <div className="side-menu__content">
+              <div className="side-menu__social">
+                <a href="#">
+                  <i className="fab fa-facebook-square"></i>
+                </a>
+                <a href="#">
+                  <i className="fab fa-twitter"></i>
+                </a>
+                <a href="#">
+                  <i className="fab fa-instagram"></i>
+                </a>
+                <a href="#">
+                  <i className="fab fa-pinterest-p"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
     </ToastProvider>
   );
 }

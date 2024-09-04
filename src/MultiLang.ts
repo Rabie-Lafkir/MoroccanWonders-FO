@@ -79,7 +79,12 @@ i18n.use(initReactI18next).init({
         signupSuccess:
           "Sign up successful! Please check your email for confirmation.",
         signupFailed: "Signup failed. Please try again.",
-        profile: "Profil"
+        profile: "Profil",
+        "reviews": "Reviews",
+      "description": "Description",
+      "location": "Location",
+      "reviews_scores": "Reviews Scores",
+      "write_a_review": "Write a Review",
       },
     },
     fr: {
@@ -160,7 +165,12 @@ i18n.use(initReactI18next).init({
         signupSuccess:
           "Inscription réussie! Veuillez vérifier votre email pour la confirmation.",
         signupFailed: "L'inscription a échoué. Veuillez réessayer.",
-        profile: "Profil"
+        profile: "Profil",
+        "reviews": "Avis",
+      "description": "Description",
+      "location": "Emplacement",
+      "reviews_scores": "Scores des avis",
+      "write_a_review": "Écrire un avis",
       },
     },
   },

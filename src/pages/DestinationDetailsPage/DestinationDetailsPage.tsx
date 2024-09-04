@@ -4,6 +4,7 @@ import axios from "axios";
 import { Galleria } from "primereact/galleria";
 import { useTranslation } from "react-i18next";
 import { timeSince } from "../../helpers/utils";
+import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 
 interface Location {
   latitude: string;
@@ -62,31 +63,23 @@ const DestinationDetailsPage: React.FC = () => {
   const currentLanguage = i18n.language as keyof NameDescription;
   const { id } = useParams<{ id: string }>();
   const [place, setPlace] = useState<Place | null>(null);
+  const [userImages, setUserImages] = useState<{ [key: string]: string }>({});
   const API_URL = import.meta.env.VITE_API_URL as string;
   const token = localStorage.getItem("accessToken");
+  const GOOGLE_MAPS_API_KEY = import.meta.env
+    .VITE_GOOGLE_MAPS_API_KEY as string;
 
   const responsiveOptions = [
-    {
-      breakpoint: "991px",
-      numVisible: 4,
-    },
-    {
-      breakpoint: "767px",
-      numVisible: 3,
-    },
-    {
-      breakpoint: "575px",
-      numVisible: 1,
-    },
+    { breakpoint: "991px", numVisible: 4 },
+    { breakpoint: "767px", numVisible: 3 },
+    { breakpoint: "575px", numVisible: 1 },
   ];
 
   useEffect(() => {
     const fetchPlaceDetails = async () => {
       try {
         const response = await axios.get(`${API_URL}/place/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
         setPlace(response.data);
       } catch (error) {
@@ -96,6 +89,45 @@ const DestinationDetailsPage: React.FC = () => {
 
     fetchPlaceDetails();
   }, [id, API_URL, token]);
+
+  useEffect(() => {
+    if (!place) return;
+
+    const fetchUserImages = async () => {
+      const images: { [key: string]: string } = {};
+      for (const rating of place.ratings) {
+        if (rating.user?.image) {
+          const imageUrl = await getImageData(rating.user.image);
+          images[rating.user.id] = imageUrl;
+        }
+      }
+      setUserImages(images);
+    };
+
+    fetchUserImages();
+  }, [place]);
+
+  const getImageData = async (fileKey: string | undefined): Promise<string> => {
+    if (!fileKey) return "";
+
+    try {
+      if (!token) throw new Error("Missing access token");
+
+      const response = await axios.get(
+        `${API_URL}/storage/download/${fileKey}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          responseType: "arraybuffer",
+        }
+      );
+
+      const blob = new Blob([response.data], { type: "image/png" });
+      return URL.createObjectURL(blob);
+    } catch (error) {
+      console.error("Error fetching image data:", error);
+      return "";
+    }
+  };
 
   if (!place) {
     return <div>Loading...</div>;
@@ -108,15 +140,17 @@ const DestinationDetailsPage: React.FC = () => {
     thumbnailImageSrc: image,
   }));
 
-  const itemTemplate = (item: any) => {
-    return (
-      <img src={item.itemImageSrc} alt="Image" style={{ width: "100%" }} />
-    );
-  };
+  const itemTemplate = (item: any) => (
+    <img src={item.itemImageSrc} alt="Image" style={{ width: "100%" }} />
+  );
 
-  const thumbnailTemplate = (item: any) => {
-    return <img src={item.thumbnailImageSrc} alt="Thumbnail" style={{ aspectRatio: "1/1", width: "50px" , height: "50px" }} />;
-  };
+  const thumbnailTemplate = (item: any) => (
+    <img
+      src={item.thumbnailImageSrc}
+      alt="Thumbnail"
+      style={{ aspectRatio: "1/1", width: "50px", height: "50px" }}
+    />
+  );
 
   return (
     <section className="tour-two tour-list">
@@ -133,14 +167,15 @@ const DestinationDetailsPage: React.FC = () => {
                     <i className="fa fa-star"></i>
                     <i className="fa fa-star"></i>
                     <i className="fa fa-star inactive"></i>{" "}
-                    { place.numberOfRatings} {t("reviews")}
+                    {place.numberOfRatings} {t("reviews")}
                   </div>
                 </div>
               </div>
               <ul className="tour-one__meta list-unstyled">
                 <li>
                   <a href="tour-details.html">
-                    <i className="far fa-clock"></i> {timeSince(place?.createdAt, 'en')}
+                    <i className="far fa-clock"></i>{" "}
+                    {timeSince(place?.createdAt, "en")}
                   </a>
                 </li>
                 <li>
@@ -173,17 +208,30 @@ const DestinationDetailsPage: React.FC = () => {
                 item={itemTemplate}
                 thumbnail={thumbnailTemplate}
               />
-<div className="tour-details__spacer"></div>
+              <div className="tour-details__spacer"></div>
               <h3 className="tour-details__title">{t("description")}</h3>
               <p>{description[currentLanguage]}</p>
 
               <div className="tour-details__spacer"></div>
               <h3 className="tour-details__title">{t("location")}</h3>
-              <iframe
-                src={`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4562.753041141002!2d${location.longitude}!3d${location.latitude}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80e82469c2162619%3A0xba03efb7998eef6d!2sCostco+Wholesale!5e0!3m2!1sbn!2sbd!4v1562518641290!5m2!1sbn!2sbd`}
-                className="google-map__contact google-map__tour-details"
-                allowFullScreen
-              ></iframe>
+              <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY}>
+                <GoogleMap
+                  mapContainerStyle={{ width: "100%", height: "400px" }}
+                  center={{
+                    lat: parseFloat(location.latitude),
+                    lng: parseFloat(location.longitude),
+                  }}
+                  zoom={15}
+                >
+                  <Marker
+                    position={{
+                      lat: parseFloat(location.latitude),
+                      lng: parseFloat(location.longitude),
+                    }}
+                  />
+                </GoogleMap>
+              </LoadScript>
+
               <div className="tour-details__spacer"></div>
 
               <div className="tour-details__review-comment">
@@ -194,8 +242,15 @@ const DestinationDetailsPage: React.FC = () => {
                   >
                     <div className="tour-details__review-comment-top">
                       <img
-                        src={rating.user.image}
+                        src={
+                          userImages[rating.user.id] || "default-image-url.jpg"
+                        }
                         alt={`${rating.user.firstName} ${rating.user.lastName}`}
+                        style={{
+                          width: "100px",
+                          height: "100px",
+                          borderRadius: "50%",
+                        }}
                       />
                       <h3>{`${rating.user.firstName} ${rating.user.lastName}`}</h3>
                       <p>{new Date(rating.createdAt).toLocaleDateString()}</p>
@@ -206,41 +261,29 @@ const DestinationDetailsPage: React.FC = () => {
                   </div>
                 ))}
               </div>
-
+            </div>
+          </div>
+          <div className="col-lg-4">
+            <div className="tour-sidebar">
+              <h3 className="tour-details__title">Reviews Scores</h3>
+              <div className="tour-details__review-score">
+                <div className="tour-details__review-score-ave">
+                  <div className="my-auto d-flex align-items-center justify-content-center">
+                    <h3>{place.generalRating}</h3>
+                    <p>
+                      <i className="fa fa-star"></i> Super
+                    </p>
+                  </div>
+                </div>
+              </div>
               <h3 className="tour-details__title">{t("write_a_review")}</h3>
               <div className="tour-details__review-form">
+                
                 <form
                   action="https://pixydrops.com/tripo/inc/sendemail.php"
                   className="contact-one__form"
                 >
                   <div className="row low-gutters">
-                    <div className="col-md-6">
-                      <div className="input-group">
-                        <input
-                          type="text"
-                          name="name"
-                          placeholder={t("your_name")}
-                        />
-                      </div>
-                    </div>
-                    <div className="col-md-6">
-                      <div className="input-group">
-                        <input
-                          type="text"
-                          name="email"
-                          placeholder={t("email_address")}
-                        />
-                      </div>
-                    </div>
-                    <div className="col-md-12">
-                      <div className="input-group">
-                        <input
-                          type="text"
-                          name="subject"
-                          placeholder={t("review_title")}
-                        />
-                      </div>
-                    </div>
                     <div className="col-md-12">
                       <div className="input-group">
                         <textarea
@@ -261,24 +304,6 @@ const DestinationDetailsPage: React.FC = () => {
                     </div>
                   </div>
                 </form>
-              </div>
-            </div>
-          </div>
-          <div className="col-lg-4">
-            <div className="tour-sidebar">
-              <div className="tour-sidebar__organizer">
-                <h3>{t("organized_by")}</h3>
-                <div className="tour-sidebar__organizer-content">
-                  <img
-                    src="src/assets/images/tour/tour-organizer-1-1.jpg"
-                    alt="Organizer"
-                  />
-                  <p>
-                    <i className="fa fa-star"></i>8.0 {t("superb")}
-                  </p>
-                  <h3>Mike Hardson</h3>
-                  <span>{t("member_since", { year: 2019 })}</span>
-                </div>
               </div>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import { useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet";
@@ -20,25 +20,11 @@ export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
   const [errors, setErrors] = useState({ username: "", password: "" });
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const toastContext = useContext(ToastContext);
-
-  /**
-   * Handling 'Remember me' logic
-   */
-  useEffect(() => {
-    const savedUsername = localStorage.getItem("rememberMeUsername");
-    const savedPassword = localStorage.getItem("rememberMePassword");
-    if (savedUsername && savedPassword) {
-      setUsername(savedUsername);
-      setPassword(savedPassword);
-      setRememberMe(true);
-    }
-  }, []);
 
   /**
    * Regex for email validation
@@ -115,13 +101,6 @@ export default function LoginPage() {
         })
       );
 
-      if (rememberMe) {
-        localStorage.setItem("rememberMeUsername", username);
-        localStorage.setItem("rememberMePassword", password);
-      } else {
-        localStorage.removeItem("rememberMeUsername");
-        localStorage.removeItem("rememberMePassword");
-      }
       setLoading(false);
       navigate("/");
     } catch (error) {
@@ -225,17 +204,6 @@ export default function LoginPage() {
                         <div className="error-message">{errors.password}</div>
                       )}
                     </div>
-                  </div>
-                  <div className="col-md-12">
-                    <input
-                      name="rememberMe"
-                      type="checkbox"
-                      checked={rememberMe}
-                      onChange={(e) => setRememberMe(e.target.checked)}
-                    />
-                    <label htmlFor="rememberMe" className="ml-2">
-                      {t("rememberMe")}
-                    </label>
                   </div>
                   <div className="col-md-12">
                     <div className="input-group">

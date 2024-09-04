@@ -44,7 +44,7 @@ const AvatarCustom: React.FC<AvatarCustomProps> = ({
       <Avatar
         label={image ? undefined : label}
         className="mr-2 ml-3"
-        style={{ backgroundColor, color: '#ffffff' }}
+        style={{ backgroundColor, color: '#ffffff', cursor: 'pointer' }}
         shape="circle"
         size={size}
         image={image}

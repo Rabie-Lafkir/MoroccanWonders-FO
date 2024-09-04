@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { profileNavigationData } from "./profileNavigationData";
 import "./ProfilePage.css";
@@ -7,16 +7,59 @@ import AvatarCustom from "../../components/AvatarCustom/AvatarCustom";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { Link, Outlet, useLocation } from "react-router-dom";
+import axios from "axios";
 
 const ProfilePage: React.FC = () => {
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const user = useSelector((state: RootState) => state.auth.user);
   const location = useLocation();
+  const [image, setImage] = useState('')
+  const API_URL = import.meta.env.VITE_API_URL;
+
 
 
   const toggleSidebar = () => {
     setSidebarExpanded(!sidebarExpanded);
   };
+
+  const getImageData = async (fileKey: string | undefined): Promise<string> => {
+    if (!fileKey) {
+      return ""; // Return an empty string if there's no fileKey
+    }
+
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) throw new Error("Missing access token");
+
+      const response = await axios.get(
+        `${API_URL}/storage/download/${fileKey}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          responseType: "arraybuffer", // This is important for binary data
+        }
+      );
+
+      // Convert the binary data to a Blob
+      const blob = new Blob([response.data], { type: "image/png" }); // Adjust the type if necessary
+      return URL.createObjectURL(blob);
+    } catch (error) {
+      console.error("Error fetching image data:", error);
+      return "";
+    }
+  };
+
+  useEffect(() => {
+    const fetchImage = async () => {
+      const imageUrl = await getImageData(user?.image);
+      setImage(imageUrl);
+    };
+
+    if (user?.image) {
+      fetchImage();
+    }
+  }, [user?.image]);
 
   return (
     <div className="wrapper">
@@ -31,6 +74,7 @@ const ProfilePage: React.FC = () => {
             <AvatarCustom
               firstName={user?.firstName || "U"}
               lastName={user?.lastName || "U"}
+              image={image}
               size={sidebarExpanded ? "xlarge" : "normal"}
               onClick={() => {}}
             />
