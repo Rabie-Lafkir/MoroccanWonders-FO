@@ -66,8 +66,7 @@ const DestinationDetailsPage: React.FC = () => {
   const [userImages, setUserImages] = useState<{ [key: string]: string }>({});
   const API_URL = import.meta.env.VITE_API_URL as string;
   const token = localStorage.getItem("accessToken");
-  const GOOGLE_MAPS_API_KEY = import.meta.env
-    .VITE_GOOGLE_MAPS_API_KEY as string;
+  const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string;
 
   const responsiveOptions = [
     { breakpoint: "991px", numVisible: 4 },
@@ -175,12 +174,7 @@ const DestinationDetailsPage: React.FC = () => {
                 <li>
                   <a href="tour-details.html">
                     <i className="far fa-clock"></i>{" "}
-                    {timeSince(place?.createdAt, "en")}
-                  </a>
-                </li>
-                <li>
-                  <a href="tour-details.html">
-                    <i className="far fa-user-circle"></i> {place?.createdBy}
+                    {timeSince(place?.createdAt, currentLanguage)}
                   </a>
                 </li>
                 <li>
@@ -204,7 +198,7 @@ const DestinationDetailsPage: React.FC = () => {
                 value={galleriaImages}
                 responsiveOptions={responsiveOptions}
                 numVisible={5}
-                style={{ maxWidth: "640px" }}
+                style={{ maxWidth: "840px" }}
                 item={itemTemplate}
                 thumbnail={thumbnailTemplate}
               />
@@ -298,7 +292,7 @@ const DestinationDetailsPage: React.FC = () => {
                           type="submit"
                           className="thm-btn contact-one__btn"
                         >
-                          {t("submit_review")}
+                          {t("submit")}
                         </button>
                       </div>
                     </div>
