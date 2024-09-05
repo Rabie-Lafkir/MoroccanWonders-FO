@@ -90,8 +90,10 @@ const DestinationDetailsPage: React.FC = () => {
           label: "Modifier",
           icon: "pi pi-pencil",
           command: () => {
-            const rating = place?.ratings.find((r) => r.user.id === user?.userId);
-            console.log('Found rating:', rating);
+            const rating = place?.ratings.find(
+              (r) => r.user.id === user?.userId
+            );
+            console.log("Found rating:", rating);
             if (rating) {
               setEditingRatingId(rating.id);
               setEditValue(rating.rate);
@@ -104,14 +106,13 @@ const DestinationDetailsPage: React.FC = () => {
           label: "Supprimer",
           icon: "pi pi-trash",
           command: () => {
-            console.log('Deleting rating with id:', ratingId);
+            console.log("Deleting rating with id:", ratingId);
             deleteRating(ratingId);
           },
         },
       ],
     },
   ];
-  
 
   const [value, setValue] = useState<number | null>(null);
   const [comment, setComment] = useState<string>("");
@@ -221,7 +222,7 @@ const DestinationDetailsPage: React.FC = () => {
   };
 
   const deleteRating = async (ratingId: string) => {
-    console.log('Deleting rating with id:', ratingId);
+    console.log("Deleting rating with id:", ratingId);
     try {
       await axios.delete(`${API_URL}/rating/${ratingId}`, {
         headers: {
@@ -231,14 +232,14 @@ const DestinationDetailsPage: React.FC = () => {
       });
       refetchPlaceDetails();
     } catch (error) {
-      console.log('Error deleting rating:', error);
+      console.log("Error deleting rating:", error);
     }
   };
-  
+
   const updateRating = async () => {
-    console.log('Updating rating with id:', editingRatingId);
+    console.log("Updating rating with id:", editingRatingId);
     if (editingRatingId === null || editValue === null || !editComment) return;
-  
+
     try {
       await axios.put(
         `${API_URL}/rating/${editingRatingId}`,
@@ -261,7 +262,6 @@ const DestinationDetailsPage: React.FC = () => {
       console.error("Error updating rating:", error);
     }
   };
-  
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
