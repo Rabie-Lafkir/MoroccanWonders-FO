@@ -76,7 +76,6 @@ const DestinationDetailsPage: React.FC = () => {
   const GOOGLE_MAPS_API_KEY = import.meta.env
     .VITE_GOOGLE_MAPS_API_KEY as string;
   const menuLeft = useRef<Menu>(null);
-  const menuRight = useRef<Menu>(null);
   const [visible, setVisible] = useState<boolean>(false);
 
   const user = useSelector((state: RootState) => state.auth.user);
@@ -91,9 +90,10 @@ const DestinationDetailsPage: React.FC = () => {
           label: "Modifier",
           icon: "pi pi-pencil",
           command: () => {
-            const rating = place?.ratings.find((r) => r.id === ratingId);
+            const rating = place?.ratings.find((r) => r.user.id === user?.userId);
+            console.log('Found rating:', rating);
             if (rating) {
-              setEditingRatingId(ratingId);
+              setEditingRatingId(rating.id);
               setEditValue(rating.rate);
               setEditComment(rating.comment);
               setVisible(true);
@@ -103,11 +103,15 @@ const DestinationDetailsPage: React.FC = () => {
         {
           label: "Supprimer",
           icon: "pi pi-trash",
-          command: () => deleteRating(ratingId),
+          command: () => {
+            console.log('Deleting rating with id:', ratingId);
+            deleteRating(ratingId);
+          },
         },
       ],
     },
   ];
+  
 
   const [value, setValue] = useState<number | null>(null);
   const [comment, setComment] = useState<string>("");
@@ -216,12 +220,26 @@ const DestinationDetailsPage: React.FC = () => {
     }
   };
 
-  const updateRating = async () => {
-    if (editingRatingId === null || editValue === null || !editComment) return;
-
+  const deleteRating = async (ratingId: string) => {
+    console.log('Deleting rating with id:', ratingId);
     try {
-      if (!token) throw new Error("Missing access token");
-
+      await axios.delete(`${API_URL}/rating/${ratingId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      refetchPlaceDetails();
+    } catch (error) {
+      console.log('Error deleting rating:', error);
+    }
+  };
+  
+  const updateRating = async () => {
+    console.log('Updating rating with id:', editingRatingId);
+    if (editingRatingId === null || editValue === null || !editComment) return;
+  
+    try {
       await axios.put(
         `${API_URL}/rating/${editingRatingId}`,
         {
@@ -236,34 +254,14 @@ const DestinationDetailsPage: React.FC = () => {
           },
         }
       );
-
       console.log("Rating updated successfully");
-      // Refetch place details to update the page
       refetchPlaceDetails();
-      // Optionally clear the form fields and close the dialog
-      setEditingRatingId(null);
-      setEditValue(null);
-      setEditComment("");
       setVisible(false);
     } catch (error) {
       console.error("Error updating rating:", error);
     }
   };
-
-  const deleteRating = async (ratingId: string) => {
-    try {
-      await axios.delete(`${API_URL}/rating/${ratingId}`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      // Refetch place details to update the page
-      refetchPlaceDetails();
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -272,11 +270,7 @@ const DestinationDetailsPage: React.FC = () => {
 
   const footerContent = (
     <div>
-      <button
-        type="button"
-        className="thm-btn"
-        onClick={updateRating}
-      >
+      <button type="button" className="thm-btn" onClick={updateRating}>
         {t("update")}
       </button>
     </div>
@@ -423,7 +417,7 @@ const DestinationDetailsPage: React.FC = () => {
                         />
                         <button
                           className="mr-2"
-                          onClick={(event) => menuLeft.current.toggle(event)}
+                          onClick={(event) => menuLeft.current?.toggle(event)}
                           aria-controls="popup_menu_right"
                           aria-haspopup="true"
                           style={{
@@ -433,41 +427,36 @@ const DestinationDetailsPage: React.FC = () => {
                         >
                           <i className="pi pi-ellipsis-v"></i>
                         </button>
-                          <Dialog
-                            visible={visible}
-                            modal
-                            header={headerElement}
-                            footer={footerContent}
-                            style={{ width: "50rem" }}
-                            onHide={() => {
-                              setVisible(false);
-                              setEditingRatingId(null);
-                              setEditValue(null);
-                              setEditComment("");
-                            }}
-                          >
-                            
-                            <form className="tour-sidebar__search-form">
-                              <div className="input-group">
-                                <PrimeRating
-                                  value={editValue}
-                                  onChange={(e) => setEditValue(e.value)}
-                                  cancel={false}
-                                />
-                              </div>
-                              <div className="input-group">
-                                <textarea
-                                  placeholder="Message"
-                                  value={editComment}
-                                  onChange={(e) =>
-                                    setEditComment(e.target.value)
-                                  }
-                                ></textarea>
-                              </div>
-                            </form>
-                          
-
-                          </Dialog>
+                        <Dialog
+                          visible={visible}
+                          modal
+                          header={headerElement}
+                          footer={footerContent}
+                          style={{ width: "50rem" }}
+                          onHide={() => {
+                            setVisible(false);
+                            setEditingRatingId(null);
+                            setEditValue(null);
+                            setEditComment("");
+                          }}
+                        >
+                          <form className="tour-sidebar__search-form">
+                            <div className="input-group">
+                              <PrimeRating
+                                value={editValue}
+                                onChange={(e) => setEditValue(e.value)}
+                                cancel={false}
+                              />
+                            </div>
+                            <div className="input-group">
+                              <textarea
+                                placeholder="Message"
+                                value={editComment}
+                                onChange={(e) => setEditComment(e.target.value)}
+                              ></textarea>
+                            </div>
+                          </form>
+                        </Dialog>
                       </div>
                     </div>
 
