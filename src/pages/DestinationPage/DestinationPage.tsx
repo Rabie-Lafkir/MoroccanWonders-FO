@@ -167,7 +167,7 @@ export default function DestinationPage() {
                         <li>
                           <div>
                             <i className="far fa-clock"></i>{" "}
-                            {timeSince(destination?.createdAt, currentLanguage)}
+                            {timeSince(destination?.createdAt, currentLanguage as "en" | "fr")}
                           </div>
                         </li>
                         <li>

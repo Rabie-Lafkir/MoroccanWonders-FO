@@ -9,7 +9,7 @@ export default function HomePage() {
   const { t,i18n } = useTranslation();
   const title: string = `${t("home")} - Moroccan Wonders`;
   const [destinations, setDestinations] = useState<Destination[]>([]);
-  const [pageNo, setPageNo] = useState(0);
+  const [pageNo] = useState(0);
   const [pageSize] = useState(3);
   const API_URL = import.meta.env.VITE_API_URL;
   const token = localStorage.getItem("accessToken");
@@ -132,7 +132,7 @@ export default function HomePage() {
         <div className="col-xl-4 col-lg-6" key={index}>
           <div className="tour-one__single">
             <div className="tour-one__image">
-              <img src={destination?.images[0] || "src/assets/images/tour/tour-1-1.jpg"} alt={destination.name[currentLanguage]} />
+              <img src={destination?.images[0] || "src/assets/images/tour/tour-1-1.jpg"} alt={destination.name[currentLanguage as "en" | "fr"]} />
               <a href={`tour-details.html?id=${destination.id}`}>
                 <i className="fa fa-heart"></i>
               </a>
@@ -142,12 +142,12 @@ export default function HomePage() {
                 <i className="fa fa-star"></i> {destination.generalRating} Superb
               </div>
               <h3>
-                <a href={`tour-details.html?id=${destination.id}`}>{destination.name[currentLanguage]}</a>
+                <a href={`tour-details.html?id=${destination.id}`}>{destination.name[currentLanguage as "en" | "fr"]}</a>
               </h3>
               <ul className="tour-one__meta list-unstyled">
                 <li>
                   <a href={`tour-details.html?id=${destination.id}`}>
-                    <i className="far fa-clock"></i> {timeSince(destination.createdAt, currentLanguage)}
+                    <i className="far fa-clock"></i> {timeSince(destination.createdAt, currentLanguage as "en" | "fr")}
                   </a>
                 </li>
                 <li>
