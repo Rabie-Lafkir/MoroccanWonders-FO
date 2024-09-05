@@ -24,7 +24,7 @@ export default function DestinationPage() {
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [pageNo, setPageNo] = useState(0);
-  const [pageSize] = useState(1);
+  const [pageSize] = useState(10);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [totalPages, setTotalPages] = useState(0);
@@ -102,7 +102,7 @@ export default function DestinationPage() {
             <div className="col-lg-8">
               <div className="tour-sorter-one">
                 <h3>
-                  {destinations.length} {t("Tours Found")}
+                  {destinations.length} {t("places_found")}
                 </h3>
               </div>
               {loading ? (
@@ -219,7 +219,7 @@ export default function DestinationPage() {
                           <input
                             className="pl-0"
                             type="search"
-                            placeholder={t("Search by place name")}
+                            placeholder={t("search_place_name")}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                           />
@@ -230,7 +230,7 @@ export default function DestinationPage() {
                   </div>
                   <div className="tour-sidebar__sorter-single">
                     <div className="tour-sidebar__sorter-top">
-                      <h3>{t("Categories")}</h3>
+                      <h3>{t("categories")}</h3>
                       <button className="tour-sidebar__sorter-toggler">
                         <i className="fa fa-angle-down"></i>
                       </button>
