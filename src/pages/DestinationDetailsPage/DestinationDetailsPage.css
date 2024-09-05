@@ -1,3 +1,11 @@
 .p-rating .p-rating-item.p-rating-item-active .p-rating-icon {
     color: #ffa801 !important;
 }
+
+button {
+    background-color: transparent;
+    outline: none;
+    border: none;
+    color: gray;
+}
+

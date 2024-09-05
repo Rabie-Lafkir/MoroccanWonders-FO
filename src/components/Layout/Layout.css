@@ -41,3 +41,12 @@
     border-radius: 50%;
   }
   
+  .sticky {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 9999;
+    background-color: #fff; /* Add background to prevent text overlap */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional shadow for visibility */
+  }
+  

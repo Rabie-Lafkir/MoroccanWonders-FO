@@ -6,7 +6,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { Destination, DestinationResponse } from "../../types/Destination";
 import { Category } from "../../types/Category";
-import {truncateText } from "../../helpers/utils";
+import { timeSince, truncateText } from "../../helpers/utils";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "../../store/loadingSlice";
@@ -166,12 +166,8 @@ export default function DestinationPage() {
                       <ul className="tour-one__meta list-unstyled">
                         <li>
                           <div>
-                            <i className="far fa-clock"></i>
-                          </div>
-                        </li>
-                        <li>
-                          <div>
-                            <i className="far fa-user-circle"></i> {t("12+")}
+                            <i className="far fa-clock"></i>{" "}
+                            {timeSince(destination?.createdAt, currentLanguage)}
                           </div>
                         </li>
                         <li>
@@ -221,7 +217,7 @@ export default function DestinationPage() {
                       <div className="sidebar__single sidebar__search">
                         <div className="sidebar__search-form d-flex align-items-center justify-content-center">
                           <input
-                          className="pl-0"
+                            className="pl-0"
                             type="search"
                             placeholder={t("Search by place name")}
                             value={searchTerm}

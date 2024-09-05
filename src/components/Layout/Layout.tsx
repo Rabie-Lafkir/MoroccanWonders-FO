@@ -27,6 +27,8 @@ export default function Layout() {
   const isLoading = useSelector((state: RootState) => state.loading.isLoading);
   const user = useSelector((state: RootState) => state.auth.user);
   const API_URL = import.meta.env.VITE_API_URL;
+  const [isSticky, setIsSticky] = useState(false); // Sticky state
+
 
   const handleLogout = () => {
     dispatch(clearAuthData());
@@ -95,6 +97,23 @@ export default function Layout() {
     }
   }, []);
 
+// Handle scroll event to toggle sticky class
+useEffect(() => {
+  const handleScroll = () => {
+    if (window.scrollY > 100) {
+      setIsSticky(true);
+    } else {
+      setIsSticky(false);
+    }
+  };
+
+  window.addEventListener("scroll", handleScroll);
+  return () => {
+    window.removeEventListener("scroll", handleScroll);
+  };
+}, []);
+  
+
   const handleChangeLanguage = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedLanguage = e.target.value;
     i18n.changeLanguage(selectedLanguage);
@@ -148,6 +167,7 @@ export default function Layout() {
   return (
     <ToastProvider>
       <div className="layout page-wrapper">
+        
         <div className="site-header__header-one-wrap">
           <div className="topbar-one">
             <div className="container-fluid">
@@ -191,7 +211,7 @@ export default function Layout() {
               </div>
             </div>
           </div>
-          <header className="main-nav__header-one ">
+          <header className={`main-nav__header-one ${isSticky ? "sticky" : ""}`}>
             <nav className="header-navigation stricky">
               <div className="container">
                 <div className="main-nav__logo-box">
@@ -244,12 +264,12 @@ export default function Layout() {
                 </div>
 
                 <div className="main-nav__right">
-                  <Link
+                  {/* <Link
                     to="#"
                     className="main-nav__search search-popup__toggler"
                   >
                     <i className="tripo-icon-magnifying-glass"></i>
-                  </Link>
+                  </Link> */}
                   <select
                     name="languages"
                     id="languages"

@@ -24,6 +24,7 @@ export interface Destination {
       createdAt: string;
       updatedAt: string | null;
     };
+    createdAt: string;
   }
   
   export interface DestinationResponse {
