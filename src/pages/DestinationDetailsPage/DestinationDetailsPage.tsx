@@ -12,7 +12,9 @@ import { Menu } from "primereact/menu";
 import { RootState } from "../../store/store";
 import { useSelector } from "react-redux";
 import { Dialog } from "primereact/dialog";
-
+import { useDispatch } from "react-redux";
+import { startLoading, stopLoading } from "../../store/loadingSlice";
+import { ProgressSpinner } from "primereact/progressspinner";
 interface Location {
   latitude: string;
   longitude: string;
@@ -66,6 +68,7 @@ interface Place {
 }
 
 const DestinationDetailsPage: React.FC = () => {
+  const dispatch = useDispatch();
   const { t, i18n } = useTranslation();
   const currentLanguage = i18n.language as keyof NameDescription;
   const { id } = useParams<{ id: string }>();
@@ -82,6 +85,7 @@ const DestinationDetailsPage: React.FC = () => {
   const [editingRatingId, setEditingRatingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState<number | null>(null);
   const [editComment, setEditComment] = useState<string>("");
+  const [isloading,setIsLoading] = useState(false)
 
   const items = (ratingId: string): MenuItem[] => [
     {
@@ -125,6 +129,8 @@ const DestinationDetailsPage: React.FC = () => {
 
   useEffect(() => {
     const fetchPlaceDetails = async () => {
+      setIsLoading(true)
+      dispatch(startLoading())
       try {
         const response = await axios.get(`${API_URL}/place/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -132,6 +138,10 @@ const DestinationDetailsPage: React.FC = () => {
         setPlace(response.data);
       } catch (error) {
         console.error("Error fetching place details:", error);
+        
+      } finally{
+        setIsLoading(false)
+        dispatch(stopLoading())
       }
     };
 
@@ -283,7 +293,16 @@ const DestinationDetailsPage: React.FC = () => {
   );
 
   if (!place) {
-    return <div>Loading...</div>;
+    return (
+      <div className="loading-spinner d-flex align-items-center justify-content-center">
+        <ProgressSpinner
+          style={{ width: "50px", height: "50px" }}
+          strokeWidth="8"
+          fill="var(--surface-ground)"
+          animationDuration=".5s"
+        />
+      </div>
+    );
   }
 
   const { name, description, location, images, category, ratings } = place;
