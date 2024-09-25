@@ -9,6 +9,7 @@ export interface Destination {
       fr: string;
     };
     region: string;
+    city: string;
     images: string[];
     numberOfRatings: number;
     generalRating: number;

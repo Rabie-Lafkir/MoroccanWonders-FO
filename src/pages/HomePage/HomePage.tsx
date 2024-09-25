@@ -128,7 +128,7 @@ export default function HomePage() {
       <h3>{t('popular_places')}</h3>
     </div>
     <div className="row">
-      {destinations.slice(0, 3).map((destination, index) => (
+      {destinations.map((destination, index) => (
         <div className="col-xl-4 col-lg-6" key={index}>
           <div className="tour-one__single">
             <div className="tour-one__image">

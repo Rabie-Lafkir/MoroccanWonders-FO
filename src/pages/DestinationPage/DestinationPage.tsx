@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { Destination, DestinationResponse } from "../../types/Destination";
-import { Category } from "../../types/Category";
+import { Category } from "../../Types/Category";
 import { timeSince, truncateText } from "../../helpers/utils";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { useDispatch } from "react-redux";
@@ -75,6 +75,7 @@ export default function DestinationPage() {
         );
         setDestinations(response.data.content);
         setTotalPages(response.data.totalPages);
+        console.log(response.data.content)
       } catch (err) {
         console.error(err);
       } finally {
@@ -122,15 +123,15 @@ export default function DestinationPage() {
                   >
                     <div className="tour-two__image-wrap">
                       <div className="tour-one__image">
-                        <img
-                          src={destination.images[0]}
+                        {/* <img
+                          src={destination.images[0] || ""}
                           alt={destination.name[currentLanguage as "en" | "fr"]}
                           style={{
                             aspectRatio: "1/1",
                             width: "300px",
                             height: "300px",
                           }}
-                        />
+                        /> */}
                       </div>
                     </div>
                     <div className="tour-one__content">
@@ -172,7 +173,7 @@ export default function DestinationPage() {
                         </li>
                         <li>
                           <div>
-                            <i className="far fa-map"></i> {destination.region}
+                            <i className="far fa-map"></i> {destination.city}
                           </div>
                         </li>
                       </ul>
