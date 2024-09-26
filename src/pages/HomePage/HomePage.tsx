@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import "./HomePage.css";
 import { Helmet } from "react-helmet";
 import { useEffect, useState } from "react";
-import { Destination, DestinationResponse } from "../../types/Destination";
+import { Destination, DestinationResponse } from "../../Types/Destination";
 import axios from "axios";
 import { timeSince } from "../../helpers/utils";
 export default function HomePage() {
@@ -23,7 +23,7 @@ export default function HomePage() {
           `${API_URL}/place`, 
           {
             headers: {
-              Authorization: `Bearer ${token}`,
+              //Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
             params: {
@@ -40,7 +40,7 @@ export default function HomePage() {
     };
 
     fetchPlaces();
-  }, [API_URL, token, pageNo, pageSize]); 
+  }, [API_URL, pageNo, pageSize]); 
 
   return (
     <>
@@ -132,7 +132,7 @@ export default function HomePage() {
         <div className="col-xl-4 col-lg-6" key={index}>
           <div className="tour-one__single">
             <div className="tour-one__image">
-              <img src={destination?.images[0] || "src/assets/images/tour/tour-1-1.jpg"} alt={destination.name[currentLanguage as "en" | "fr"]} />
+              {/* <img src={destination?.images[0] || "src/assets/images/tour/tour-1-1.jpg"} alt={destination.name[currentLanguage as "en" | "fr"]} /> */}
               <a href={`tour-details.html?id=${destination.id}`}>
                 <i className="fa fa-heart"></i>
               </a>

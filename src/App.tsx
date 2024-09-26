@@ -18,6 +18,7 @@ import SignUpPage from './pages/SignUpPage/SignUpPage';
 import ProfilePage from './pages/ProfilePage/ProfilePage';
 import ProfileDetailsPage from './pages/ProfilePage/ProfileDetailsPage/ProfileDetailsPage';
 import DestinationDetailsPage from './pages/DestinationDetailsPage/DestinationDetailsPage';
+import ItineraryDetailsPage from './pages/ItineraryDetailsPage/ItineraryDetailsPage';
 
 function App() {
   const dispatch = useDispatch();
@@ -45,6 +46,7 @@ function App() {
         { path: '/destination', element: <DestinationPage /> },
         { path: '/destination/:id', element: <DestinationDetailsPage /> }, // Added this route
         { path: '/itinerary', element: <ItineraryPage /> },
+        { path: '/itinerary/:id', element: <ItineraryDetailsPage /> },
         { path: '/category', element: <CategoryPage /> },
         { path: '/contact', element: <ContactPage /> },
         { path: '/signup', element: <SignUpPage /> },

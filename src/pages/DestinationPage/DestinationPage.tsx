@@ -4,7 +4,7 @@ import PageHeader from "../../components/PageHeader/PageHeader";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { Destination, DestinationResponse } from "../../types/Destination";
+import { Destination, DestinationResponse } from "../../Types/Destination";
 import { Category } from "../../Types/Category";
 import { timeSince, truncateText } from "../../helpers/utils";
 import { ProgressSpinner } from "primereact/progressspinner";
@@ -38,7 +38,7 @@ export default function DestinationPage() {
           `${API_URL}/category`,
           {
             headers: {
-              Authorization: `Bearer ${token}`,
+              //Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
           }
@@ -67,7 +67,7 @@ export default function DestinationPage() {
           `${API_URL}/place`,
           {
             headers: {
-              Authorization: `Bearer ${token}`,
+              //Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
             params,
