@@ -15,6 +15,7 @@ import { Dialog } from "primereact/dialog";
 import { useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "../../store/loadingSlice";
 import { ProgressSpinner } from "primereact/progressspinner";
+
 interface Location {
   latitude: string;
   longitude: string;
@@ -74,10 +75,10 @@ const DestinationDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [place, setPlace] = useState<Place | null>(null);
   const [userImages, setUserImages] = useState<{ [key: string]: string }>({});
+  const [galleryImages, setGalleryImages] = useState<string[]>([]);
   const API_URL = import.meta.env.VITE_API_URL as string;
   const token = localStorage.getItem("accessToken");
-  const GOOGLE_MAPS_API_KEY = import.meta.env
-    .VITE_GOOGLE_MAPS_API_KEY as string;
+  const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string;
   const menuLeft = useRef<Menu>(null);
   const [visible, setVisible] = useState<boolean>(false);
 
@@ -85,7 +86,7 @@ const DestinationDetailsPage: React.FC = () => {
   const [editingRatingId, setEditingRatingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState<number | null>(null);
   const [editComment, setEditComment] = useState<string>("");
-  const [isloading,setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
 
   const items = (ratingId: string): MenuItem[] => [
     {
@@ -129,19 +130,19 @@ const DestinationDetailsPage: React.FC = () => {
 
   useEffect(() => {
     const fetchPlaceDetails = async () => {
-      setIsLoading(true)
-      dispatch(startLoading())
+      setIsLoading(true);
+      dispatch(startLoading());
       try {
         const response = await axios.get(`${API_URL}/place/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
+          // headers: { Authorization: `Bearer ${token}` },
         });
         setPlace(response.data);
+        fetchGalleryImages(response.data.images);
       } catch (error) {
         console.error("Error fetching place details:", error);
-        
-      } finally{
-        setIsLoading(false)
-        dispatch(stopLoading())
+      } finally {
+        setIsLoading(false);
+        dispatch(stopLoading());
       }
     };
 
@@ -165,16 +166,25 @@ const DestinationDetailsPage: React.FC = () => {
     fetchUserImages();
   }, [place]);
 
+  // Fetch gallery images
+  const fetchGalleryImages = async (imageKeys: string[]) => {
+    try {
+      const imagePromises = imageKeys.map((key) => getImageData(key));
+      const fetchedImages = await Promise.all(imagePromises);
+      setGalleryImages(fetchedImages);
+    } catch (error) {
+      console.error("Error fetching gallery images:", error);
+    }
+  };
+
   const getImageData = async (fileKey: string | undefined): Promise<string> => {
     if (!fileKey) return "";
 
     try {
-      if (!token) throw new Error("Missing access token");
-
       const response = await axios.get(
         `${API_URL}/storage/download/${fileKey}`,
         {
-          headers: { Authorization: `Bearer ${token}` },
+          // headers: { Authorization: `Bearer ${token}` },
           responseType: "arraybuffer",
         }
       );
@@ -191,7 +201,7 @@ const DestinationDetailsPage: React.FC = () => {
   const refetchPlaceDetails = async () => {
     try {
       const response = await axios.get(`${API_URL}/place/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
+       // headers: { Authorization: `Bearer ${token}` },
       });
       setPlace(response.data);
     } catch (error) {
@@ -305,9 +315,10 @@ const DestinationDetailsPage: React.FC = () => {
     );
   }
 
-  const { name, description, location, images, category, ratings } = place;
+  const { name, description, location, category, ratings } = place;
 
-  const galleriaImages = images.map((image) => ({
+  // Use the fetched gallery images
+  const galleriaImages = galleryImages.map((image) => ({
     itemImageSrc: image,
     thumbnailImageSrc: image,
   }));

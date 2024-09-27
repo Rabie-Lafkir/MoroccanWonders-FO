@@ -147,7 +147,7 @@ const ItineraryDetailsPage: React.FC = () => {
       dispatch(startLoading());
       try {
         const response = await axios.get(`${API_URL}/travel_plan/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
+         // headers: { Authorization: `Bearer ${token}` },
         });
         setItinerary(response.data);
       } catch (error) {
@@ -186,7 +186,7 @@ const ItineraryDetailsPage: React.FC = () => {
       const response = await axios.get(
         `${API_URL}/storage/download/${fileKey}`,
         {
-          headers: { Authorization: `Bearer ${token}` },
+         // headers: { Authorization: `Bearer ${token}` },
           responseType: "arraybuffer",
         }
       );
@@ -203,7 +203,7 @@ const ItineraryDetailsPage: React.FC = () => {
   const refetchItineraryDetails = async () => {
     try {
       const response = await axios.get(`${API_URL}/travel_plan/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
+       // headers: { Authorization: `Bearer ${token}` },
       });
       setItinerary(response.data);
     } catch (error) {

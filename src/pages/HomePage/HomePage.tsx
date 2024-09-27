@@ -171,6 +171,7 @@ export default function HomePage() {
               <div className="col-xl-4 col-lg-6" key={index}>
                 <div className="tour-one__single">
                   <div className="tour-one__image">
+                    <div className="square-image-container" >
                     <img
                       src={
                         imageUrls[destination.images[0]] ||
@@ -180,9 +181,7 @@ export default function HomePage() {
                         destination.name[currentLanguage as "en" | "fr"]
                       }
                     />
-                    <a href={`tour-details.html?id=${destination.id}`}>
-                      <i className="fa fa-heart"></i>
-                    </a>
+                    </div>
                   </div>
                   <div className="tour-one__content">
                     <div className="tour-one__stars">
