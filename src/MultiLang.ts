@@ -97,7 +97,8 @@ i18n.use(initReactI18next).init({
       popular_places: "Most Popular Places",
       places_found: "places found",
       search_place_name : "Search by place name",
-      categories : "Categories"
+      categories : "Categories",
+      it_found: "Found itineraries"
       },
     },
     fr: {
@@ -196,7 +197,8 @@ i18n.use(initReactI18next).init({
       popular_places : "Les places plus populaires",
       places_found: "places trouvées",
       search_place_name : "Rechercher par le nom",
-      categories : "Catégories"
+      categories : "Catégories",
+      it_found: "Itinéraires trouvés"
       },
     },
   },

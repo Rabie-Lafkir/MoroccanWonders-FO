@@ -69,7 +69,7 @@ export default function ItineraryPage() {
       <section className="tour-one tour-grid">
         <div className="container">
           <div className="tour-sorter-one">
-            <h3>{`${itineraries.length} ${t("tours_found")}`}</h3>
+            <h3>{`${itineraries.length} ${t("it_found")}`}</h3>
           </div>
           <div className="row">
             {loading ? (

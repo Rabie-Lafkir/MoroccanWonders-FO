@@ -23,6 +23,7 @@ export default function DestinationPage() {
   const token = localStorage.getItem("accessToken");
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [imageUrls, setImageUrls] = useState<{ [key: string]: string }>({});
   const [pageNo, setPageNo] = useState(0);
   const [pageSize] = useState(10);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -38,7 +39,6 @@ export default function DestinationPage() {
           `${API_URL}/category`,
           {
             headers: {
-              //Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
           }
@@ -67,7 +67,6 @@ export default function DestinationPage() {
           `${API_URL}/place`,
           {
             headers: {
-              //Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
             params,
@@ -75,7 +74,7 @@ export default function DestinationPage() {
         );
         setDestinations(response.data.content);
         setTotalPages(response.data.totalPages);
-        console.log(response.data.content)
+        fetchImages(response.data.content);
       } catch (err) {
         console.error(err);
       } finally {
@@ -84,8 +83,54 @@ export default function DestinationPage() {
       }
     };
 
+    // Fetch image data for each destination using the first image key
+    const fetchImages = async (destinations: Destination[]) => {
+      const imagePromises = destinations.map(async (destination) => {
+        if (destination.images && destination.images.length > 0) {
+          try {
+            const imageUrl = await getImageData(destination.images[0]);
+            return { imageKey: destination.images[0], imageUrl };
+          } catch (error) {
+            console.error(`Error fetching image for ${destination.images[0]}:`, error);
+            return { imageKey: destination.images[0], imageUrl: "" };
+          }
+        }
+        return { imageKey: "", imageUrl: "" };
+      });
+
+      const images = await Promise.all(imagePromises);
+      const imageMap = images.reduce((acc, image) => {
+        acc[image.imageKey] = image.imageUrl;
+        return acc;
+      }, {} as { [key: string]: string });
+
+      setImageUrls(imageMap);
+    };
+
     fetchPlaces();
   }, [API_URL, token, pageNo, pageSize, selectedCategory, searchTerm]);
+
+  // Function to fetch image data from server using the file key
+  const getImageData = async (fileKey: string | undefined): Promise<string> => {
+    if (!fileKey) return "";
+
+    try {
+      const response = await axios.get(
+        `${API_URL}/storage/download/${fileKey}`,
+        {
+          responseType: "arraybuffer",
+        }
+      );
+
+      const blob = new Blob([response.data], { type: "image/png" });
+      const imageUrl = URL.createObjectURL(blob);
+      console.log(`Fetched image URL for ${fileKey}:`, imageUrl);
+      return imageUrl;
+    } catch (error) {
+      console.error("Error fetching image data:", error);
+      return "";
+    }
+  };
 
   return (
     <>
@@ -123,15 +168,18 @@ export default function DestinationPage() {
                   >
                     <div className="tour-two__image-wrap">
                       <div className="tour-one__image">
-                        {/* <img
-                          src={destination.images[0] || ""}
+                        <img
+                          src={
+                            imageUrls[destination.images[0]] ||
+                            "src/assets/images/tour/tour-1-1.jpg"
+                          }
                           alt={destination.name[currentLanguage as "en" | "fr"]}
                           style={{
                             aspectRatio: "1/1",
                             width: "300px",
                             height: "300px",
                           }}
-                        /> */}
+                        />
                       </div>
                     </div>
                     <div className="tour-one__content">
@@ -147,11 +195,6 @@ export default function DestinationPage() {
                             </Link>
                           </h3>
                         </div>
-                        {/* <div className="tour-two__right">
-                          <p>
-                            <span>${destination.generalRating}</span> <br /> {t("Per Person")}
-                          </p>
-                        </div> */}
                       </div>
 
                       <div className="tour-two__text">
